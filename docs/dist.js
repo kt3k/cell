@@ -161,6 +161,7 @@ function addEventListener(name, el, type, handler, selector) {
     `Event handler must be a function, ${typeof handler} (${handler}) is given`
   );
   const listener = (e) => {
+    console.log("hi", e);
     if (!selector || [].some.call(
       el.querySelectorAll(selector),
       (node) => node === e.target || node.contains(e.target)
@@ -177,6 +178,7 @@ function addEventListener(name, el, type, handler, selector) {
   el.addEventListener(`__unmount__:${name}`, () => {
     el.removeEventListener(type, listener);
   }, { once: true });
+  console.log(`addEventListener(${type})`, handler);
   el.addEventListener(type, listener);
 }
 function mount(name, el) {

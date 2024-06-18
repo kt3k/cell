@@ -18,7 +18,7 @@
     "size": "deno run --allow-read https://deno.land/x/gzip_size@v0.3.0/cli.ts --include-original docs/dist.min.js",
     "twd": "deno run -A --allow-read=. --allow-write=style.css --allow-net=deno.land,esm.sh,cdn.esm.sh https://deno.land/x/twd@v0.4.8/cli.ts -o style.css index.html",
     "twd-w": "deno task twd -- -w",
-    "start": "deno run --allow-read=. --allow-net=0.0.0.0:8000 deploy.ts"
+    "start": "deno run --allow-sys --allow-read=. --allow-net=0.0.0.0:8000 jsr:@std/http/file-server docs --port 8000"
   },
   "imports": {
     "@std/assert": "jsr:@std/assert@^0.226.0"

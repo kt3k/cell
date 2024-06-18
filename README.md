@@ -1,4 +1,4 @@
-<img src="https://raw.githubusercontent.com/kt3k/cell/main/cell-logo.svg" width="70" alt="capsule" />
+<img src="https://kt3k.github.io/cell/cell-logo.svg" width="70" alt="cell" />
 
 # Cell v0.1.4
 
@@ -59,11 +59,11 @@ Vanilla js (ES Module):
 
 ```html
 <script type="module">
-import { register } from "https://TBD";
+import { register } from "https://kt3k.github.io/cell/dist.min.js";
 
 function Mirroring({ on, query }: Context) {
   on.input = () => {
-    query(".src").textContent = query(".dest").value;
+    query(".dest").textContent = query(".src").value;
   };
 }
 
