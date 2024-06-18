@@ -52,16 +52,27 @@ register(MyComponent, "js-hello");
 ```
 
 ```
-<div class="js-hello"></div>
+<div class="js-hello">Click</div>
 ```
 
 Vanilla js (ES Module):
 
 ```html
 <script type="module">
-import { define } from "https://TBD";
-// ... your code ...
+import { register } from "https://TBD";
+
+function Mirroring({ on, query }: Context) {
+  on.input = () => {
+    query(".src").textContent = query(".dest").value;
+  };
+}
+
+register(Mirroring, "js-mirroring");
 </script>
+<div class="js-mirroring">
+  <input class="src" placeholder="Type something" />
+  <p class="dest"></p>
+</div>
 ```
 
 # Examples
@@ -87,36 +98,22 @@ import { type Context, register } from "@kt3k/cell";
 
 const EVENT = "my-event";
 
-{
-  const { on } = component("pub-element");
-
-  on.click = ({ pub }) => {
-    pub(EVENT, { hello: "world!" });
+function PubComponent({ on, pub }: Context) {
+  on.click = () => {
+    pub(EVENT, { hello: "clicked!" });
   };
 }
 
-{
-  const { on, sub } = component("sub-element");
-
+function SubComponent({ on, sub, el }) {
   sub(EVENT);
 
-  on[EVENT] = ({ e }) => {
-    console.log(e.detail.hello); // => world!
+  on[EVENT] = (e) => {
+    el.textContext += " " + e.detail.hello;
   };
 }
-```
 
-Mount hooks.
-
-```ts
-import { type Context, register } from "@kt3k/cell";
-
-const { on } = component("my-component");
-
-// __mount__ handler is called when the component mounts to the elements.
-on.__mount__ = () => {
-  console.log("hello, I'm mounted");
-};
+register(PubComponent, "js-pub");
+register(SubComponent, "js-sub");
 ```
 
 Prevent default, stop propagation.
@@ -124,14 +121,16 @@ Prevent default, stop propagation.
 ```ts
 import { type Context, register } from "@kt3k/cell";
 
-const { on } = component("my-component");
+function PrevetDefaultComponent({ on }: Context) {
+  on.click = (e) => {
+    // e is the native event object.
+    // You can call methods of Event object
+    e.stopPropagation();
+    e.preventDefault();
+  };
+}
 
-on.click = (e) => {
-  // e is the native event object.
-  // You can call methods of Event object
-  e.stopPropagation();
-  e.preventDefault();
-};
+register(PreventDefaultComponent, "js-prevent-default");
 ```
 
 Event delegation. You can assign handlers to `on(selector).event` to use
@@ -141,24 +140,28 @@ pattern.
 ```js
 import { register, type Context } from "@kt3k/cell";
 
-const { on } = component("my-component");
+function DelegateComponent({ on, query }: Context) {
+  on(".btn").click = () => {
+    query(".result").textContext += " .btn clicked!";
+  }
+}
 
-on(".btn").click = ({ e }) => {
-  console.log(".btn is clicked!");
-};
+register(DelegateComponent, "js-delegate");
 ```
 
 Outside event handler. By assigning `on.outside.event`, you can handle the event
 outside of the component dom.
 
-```js
-import { register, type Context } from "@kt3k/cell";
+```ts
+import { type Context, register } from "@kt3k/cell";
 
-const { on } = component("my-component");
+function OutsideClickComponent({ on }: Context) {
+  on.outside.click = ({ e }) => {
+    console.log("The outside of my-component has been clicked!");
+  };
+}
 
-on.outside.click = ({ e }) => {
-  console.log("The outside of my-component has been clicked!");
-};
+register(OutsideClickComponent, "js-outside-click");
 ```
 
 # How `cell` works
@@ -258,15 +261,15 @@ The difference is `$(this).find(".some-target")` part. This selects the elements
 only under each `.some-class` element. So this code only depends on the elements
 inside it, which means there is no global dependencies here.
 
-`cell` enforces this pattern by providing `query` function to event handlers
+`cell` enforces this pattern by providing `query` function to the component
 which only finds elements under the given element.
 
-```js
-const { on } = component("some-class");
-
-on.click = ({ query }) => {
-  query(".some-target").textContent = "clicked";
-};
+```ts
+function MyComponent({ on, query }: Context) {
+  on.click = () => {
+    query(".some-target")!.textContent = "clicked";
+  };
+}
 ```
 
 Here `query` is the alias of `el.querySelector` and it finds `.some-target` only
@@ -285,11 +288,11 @@ HTML classes, not random combination of query selectors.
 ```
 
 ```js
-const { on } = component("hello");
+function MyComponent({ on }) {
+  alert(`Hello, I'm ${el.textContext}!`);
+}
 
-on.__mount__ = () => {
-  alert(`Hello, I'm ${el.textContext}!`); // Alerts "Hello, I'm John Doe!"
-};
+register(MyComponent, "js-hello");
 ```
 
 ## Use pubsub when making remote effect
@@ -303,25 +306,25 @@ test those components independently by using events as I/O of those components.
 
 `cell` library provides `pub` and `sub` APIs for encouraging this pattern.
 
-```js
+```ts
 const EVENT = "my-event";
-{
-  const { on } = component("publisher");
 
-  on.click = ({ pub }) => {
+function PubComponent({ on, pub }: Context) {
+  on.click = () => {
     pub(EVENT);
   };
 }
 
-{
-  const { on, sub } = component("subscriber");
-
-  sub(EVENT);
+function SubComponent({ on, sub }) {
+  sub(EVENT); // This adds sub:my-event class to the mounted element, which means it subscribes to that event.
 
   on[EVENT] = () => {
     alert(`Got ${EVENT}!`);
   };
 }
+
+register(PubComponent, "js-pub-component");
+register(SubComponent, "js-sub-component");
 ```
 
 Note: `cell` uses DOM Event as event payload, and `sub:EVENT` HTML class as
