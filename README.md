@@ -1,6 +1,6 @@
 <img src="https://raw.githubusercontent.com/kt3k/cell/main/cell-logo.svg" width="70" alt="capsule" />
 
-# Cell v0.1.0
+# Cell v0.1.1
 
 > Event-driven DOM programming in a new style
 
