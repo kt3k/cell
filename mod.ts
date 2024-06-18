@@ -1,4 +1,4 @@
-/*! Cell v0.1.3 | Copyright 2024 Yoshiya Hinosawa and Capsule contributors | MIT license */
+/*! Cell v0.1.2 | Copyright 2024 Yoshiya Hinosawa and Capsule contributors | MIT license */
 import { documentReady, logEvent } from "./util.ts";
 
 interface Initializer {
@@ -20,6 +20,11 @@ interface EventRegistry {
   };
 }
 
+/**
+ * The context of the component. This context is passed as the first argument to the component function for each mount.
+ *
+ * @typeParam EL The element type of the component
+ */
 export interface Context<EL = HTMLElement> {
   /** The element */
   el: EL;
