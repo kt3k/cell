@@ -288,7 +288,7 @@ HTML classes, not random combination of query selectors.
 ```
 
 ```js
-function MyComponent({ on }) {
+function MyComponent({ on }: Context) {
   alert(`Hello, I'm ${el.textContext}!`);
 }
 
@@ -315,7 +315,7 @@ function PubComponent({ on, pub }: Context) {
   };
 }
 
-function SubComponent({ on, sub }) {
+function SubComponent({ on, sub }: Context) {
   sub(EVENT); // This adds sub:my-event class to the mounted element, which means it subscribes to that event.
 
   on[EVENT] = () => {
