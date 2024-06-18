@@ -7,7 +7,7 @@
   "compilerOptions": {
     "lib": ["deno.ns", "deno.unstable", "dom", "esnext"]
   },
-  "exclude": ["node", "dist.js", "dist.min.js"],
+  "exclude": ["docs/dist.js", "docs/dist.min.js"],
   "tasks": {
     "test": "deno test -A",
     "cov": "deno test --coverage -A",
