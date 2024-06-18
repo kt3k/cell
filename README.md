@@ -21,7 +21,7 @@ TodoMVC implementation is also available
 
 ## Live examples
 
-See [the live demos](https://cell.deno.dev/).
+See [the live demos](https://celljs.deno.dev/).
 
 # Install
 
