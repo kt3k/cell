@@ -1,57 +1,57 @@
 // Copyright 2022 Yoshiya Hinosawa. All rights reserved. MIT license.
 
-import { assert, assertEquals, assertThrows } from "@std/assert";
-import "./dom_polyfill_deno.ts";
-import { component, mount, unmount } from "./mod.ts";
+import { assert, assertExists, assertFalse } from "@std/assert";
+import "./dom_polyfill.ts";
+import { type Context, mount, register } from "./mod.ts";
 
 // disable debug logs because it's too verbose for unit testing
 // deno-lint-ignore no-explicit-any
 (globalThis as any).__DEV__ = false;
 
-Deno.test("on.__mount__ is called when the component is mounted", () => {
+Deno.test("Component body is called when the component is mounted", () => {
   const name = randomName();
-  const { on } = component(name);
 
   document.body.innerHTML = `<div class="${name}"></div>`;
 
   let called = false;
 
-  on.__mount__ = () => {
+  function Component() {
     called = true;
-  };
+  }
+
+  register(Component, name);
+
+  assertFalse(called);
 
   mount();
 
   assert(called);
 });
 
-Deno.test("on.__mount__ is called after other initialization is finished", () => {
+Deno.test("sub() add sub:type class to the dom", () => {
   const name = randomName();
-  const { on, is, sub, innerHTML } = component(name);
 
   document.body.innerHTML = `<div class="${name}"></div>`;
 
-  let hasFoo = false;
-  let hasSubBar = false;
-  let hasInnerHTML = false;
+  function Component({ el, sub }: Context) {
+    el.classList.add("foo");
+    sub("bar");
+    return "<p>hello</p>";
+  }
 
-  on.__mount__ = ({ el }) => {
-    hasFoo = el.classList.contains("foo");
-    hasSubBar = el.classList.contains("sub:bar");
-    hasInnerHTML = el.innerHTML === "<p>hello</p>";
-  };
-
-  is("foo");
-  sub("bar");
-  innerHTML("<p>hello</p>");
+  register(Component, name);
 
   mount();
 
-  assert(hasFoo);
-  assert(hasSubBar);
-  assert(hasInnerHTML);
+  const div = document.body.querySelector(`.${name}`);
+
+  assertExists(div);
+  assert(div.classList.contains("foo"));
+  assert(div.classList.contains("sub:bar"));
+  assert(div.innerHTML === "<p>hello</p>");
 });
 
+/*
 Deno.test("on.__unmount__ is called when the componet is unmounted", () => {
   const name = randomName();
   const { on } = component(name);
@@ -358,8 +358,11 @@ Deno.test("unmount with non registered name throws", () => {
   });
 });
 
-// test utils
-const randomName = () => "c-" + Math.random().toString(36).slice(2);
+
 const query = (s: string) => document.querySelector<HTMLElement>(s);
 const queryByClass = (name: string) =>
   document.querySelector<HTMLElement>(`.${name}`);
+
+*/
+// test utils
+const randomName = () => "c-" + Math.random().toString(36).slice(2);

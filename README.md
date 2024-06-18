@@ -1,22 +1,202 @@
-<img src="https://raw.githubusercontent.com/capsidjs/capsule/master/capsule-logo.svg" width="70" alt="capsule" />
+<img src="https://raw.githubusercontent.com/kt3k/cell/main/cell-logo.svg" width="70" alt="capsule" />
 
-# Capsule v0.6.1
-
-[![ci](https://github.com/capsidjs/capsule/actions/workflows/ci.yml/badge.svg)](https://github.com/capsidjs/capsule/actions/workflows/ci.yml)
+# Cell v0.1.0
 
 > Event-driven DOM programming in a new style
 
 # Features
 
-- Supports **event-driven** style of frontend programming in a **new way**.
-- Supports **event delegation** and **outside events** out of the box.
-- **Lightweight** library.
-  [**1.25 kiB**](https://raw.githubusercontent.com/capsidjs/capsule/v0.6.1/dist.min.js)
-  gzipped. **No dependencies**. **No build** steps.
-- Uses **plain JavaScript** and **plain HTML**, requires **No special syntax**.
+- Supports **event-driven** DOM programming in a new way.
+- Supports **event delegation**.
+- **Lightweight** library. **< 1.5 kiB** gzipped.
+- **No dependencies**.
+- **No build** step.
+- Uses **No special syntax**. Uses **plain JavaScript** and **plain HTML**.
 - **TypeScript** friendly.
 
-[See live examples](https://capsule.deno.dev/)
+## TodoMVC
+
+TodoMVC implementation is also available
+[here](https://github.com/kt3k/cell-todomvc).
+
+## Live examples
+
+See [the live demos](https://cell.deno.dev/).
+
+# Install
+
+Deno
+
+```
+deno add @kt3k/cell
+```
+
+Node
+
+```
+npx jsr add @kt3k/cell
+```
+
+And
+
+```ts
+import { type Context, register } from "@kt3k/cell";
+
+function MyComponent({ on }: Context) {
+  on.click = () => {
+    alert("hello");
+  };
+}
+
+register(MyComponent, "js-hello");
+```
+
+```
+<div class="js-hello"></div>
+```
+
+Vanilla js (ES Module):
+
+```html
+<script type="module">
+import { define } from "https://TBD";
+// ... your code ...
+</script>
+```
+
+# Examples
+
+Mirrors input value of `<input>` element to another dom.
+
+```ts
+import { type Context, register } from "@kt3k/cell";
+
+function Mirroring({ on, query }: Context) {
+  on.input = () => {
+    query(".src").textContent = query(".dest").value;
+  };
+}
+
+register(Mirroring, "js-mirroring");
+```
+
+Pubsub.
+
+```ts
+import { type Context, register } from "@kt3k/cell";
+
+const EVENT = "my-event";
+
+{
+  const { on } = component("pub-element");
+
+  on.click = ({ pub }) => {
+    pub(EVENT, { hello: "world!" });
+  };
+}
+
+{
+  const { on, sub } = component("sub-element");
+
+  sub(EVENT);
+
+  on[EVENT] = ({ e }) => {
+    console.log(e.detail.hello); // => world!
+  };
+}
+```
+
+Mount hooks.
+
+```ts
+import { type Context, register } from "@kt3k/cell";
+
+const { on } = component("my-component");
+
+// __mount__ handler is called when the component mounts to the elements.
+on.__mount__ = () => {
+  console.log("hello, I'm mounted");
+};
+```
+
+Prevent default, stop propagation.
+
+```ts
+import { type Context, register } from "@kt3k/cell";
+
+const { on } = component("my-component");
+
+on.click = (e) => {
+  // e is the native event object.
+  // You can call methods of Event object
+  e.stopPropagation();
+  e.preventDefault();
+};
+```
+
+Event delegation. You can assign handlers to `on(selector).event` to use
+[event delegation](https://www.geeksforgeeks.org/event-delegation-in-javascript/)
+pattern.
+
+```js
+import { register, type Context } from "@kt3k/cell";
+
+const { on } = component("my-component");
+
+on(".btn").click = ({ e }) => {
+  console.log(".btn is clicked!");
+};
+```
+
+Outside event handler. By assigning `on.outside.event`, you can handle the event
+outside of the component dom.
+
+```js
+import { register, type Context } from "@kt3k/cell";
+
+const { on } = component("my-component");
+
+on.outside.click = ({ e }) => {
+  console.log("The outside of my-component has been clicked!");
+};
+```
+
+# How `cell` works
+
+Let's look at the below basic example.
+
+```ts
+import { type Context, register } from "@kt3k/cell";
+
+function MyComponent({ on }: Context) {
+  on.click = () => {
+    console.log("clicked");
+  };
+}
+
+register(MyComponent, "my-component");
+```
+
+This code is roughly translated into jQuery like the below:
+
+```js
+$(document).read(() => {
+  $(".my-component").each(function () {
+    $this = $(this);
+
+    if (isAlreadyInitialized($this)) {
+      return;
+    }
+
+    $this.click(() => {
+      console.log("clicked");
+    });
+  });
+});
+```
+
+`cell` can be seen as a syntax sugar for the above pattern (with a few more
+utilities).
 
 # Motivation
 
@@ -24,8 +204,8 @@ Virtual DOM frameworks are good for many use cases, but sometimes they are
 overkill for the use cases where you only need a little bit of event handlers
 and dom modifications.
 
-This `capsule` library explores the new way of simple event-driven DOM
-programming without virtual dom.
+This `cell` library explores the new way of simple event-driven DOM programming
+without virtual dom.
 
 # Slogans
 
@@ -78,7 +258,7 @@ The difference is `$(this).find(".some-target")` part. This selects the elements
 only under each `.some-class` element. So this code only depends on the elements
 inside it, which means there is no global dependencies here.
 
-`capsule` enforces this pattern by providing `query` function to event handlers
+`cell` enforces this pattern by providing `query` function to event handlers
 which only finds elements under the given element.
 
 ```js
@@ -97,8 +277,8 @@ under it. So the dependency is **local** here.
 From our observation, skilled jQuery developers always define DOM behaviors
 based on HTML classes.
 
-We borrowed this pattern, and `capsule` allows you to define behavior only based
-on HTML classes, not random combination of query selectors.
+We borrowed this pattern, and `cell` allows you to define behavior only based on
+HTML classes, not random combination of query selectors.
 
 ```html
 <div class="hello">John Doe</div>
@@ -121,7 +301,7 @@ We reommend using pubsub pattern here. By using this pattern, you can decouple
 those affecting and affected elements. If you decouple those elements, you can
 test those components independently by using events as I/O of those components.
 
-`capsule` library provides `pub` and `sub` APIs for encouraging this pattern.
+`cell` library provides `pub` and `sub` APIs for encouraging this pattern.
 
 ```js
 const EVENT = "my-event";
@@ -144,412 +324,14 @@ const EVENT = "my-event";
 }
 ```
 
-Note: `capsule` uses DOM Event as event payload, and `sub:EVENT` HTML class as
+Note: `cell` uses DOM Event as event payload, and `sub:EVENT` HTML class as
 registration to the event. When `pub(EVENT)` is called the CustomEvent of
 `EVENT` type are dispatched to the elements which have `sub:EVENT` class.
 
-## TodoMVC
-
-TodoMVC implementation is also available
-[here](https://github.com/capsidjs/capsule-todomvc).
-
-## Live examples
-
-See [the live demos](https://capsule.deno.dev/).
-
-# Install
-
-Vanilla js (ES Module):
-
-```html
-<script type="module">
-import { component } from "https://deno.land/x/capsule@v0.6.1/dist.min.js";
-// ... your code ...
-</script>
-```
-
-Vanilla js (Legacy script tag):
-
-```html
-<script src="https://deno.land/x/capsule@v0.6.1/loader.js"></script>
-<script>
-capsuleLoader.then((capsule) => {
-  const { component } = capsule;
-  // ... your code ...
-});
-</script>
-```
-
-Deno:
-
-```js
-import { component } from "https://deno.land/x/capsule@v0.6.1/mod.ts";
-```
-
-Via npm:
-
-```
-npm install @kt3k/capsule
-```
-
-and
-
-```js
-import { component } from "@kt3k/capsule";
-```
-
-# Examples
-
-Mirrors input value of `<input>` element to another dom.
-
-```js
-import { component } from "https://deno.land/x/capsule@v0.6.1/dist.min.js";
-
-const { on } = component("mirroring");
-
-on.input = ({ query }) => {
-  query(".src").textContent = query(".dest").value;
-};
-```
-
-Pubsub.
-
-```js
-import { component } from "https://deno.land/x/capsule@v0.6.1/dist.min.js";
-
-const EVENT = "my-event";
-
-{
-  const { on } = component("pub-element");
-
-  on.click = ({ pub }) => {
-    pub(EVENT, { hello: "world!" });
-  };
-}
-
-{
-  const { on, sub } = component("sub-element");
-
-  sub(EVENT);
-
-  on[EVENT] = ({ e }) => {
-    console.log(e.detail.hello); // => world!
-  };
-}
-```
-
-Mount hooks.
-
-```js
-import { component } from "https://deno.land/x/capsule@v0.6.1/dist.min.js";
-
-const { on } = component("my-component");
-
-// __mount__ handler is called when the component mounts to the elements.
-on.__mount__ = () => {
-  console.log("hello, I'm mounted");
-};
-```
-
-Prevent default, stop propagation.
-
-```js
-import { component } from "https://deno.land/x/capsule@v0.6.1/dist.min.js";
-
-const { on } = component("my-component");
-
-on.click = ({ e }) => {
-  // e is the native event object.
-  // You can call methods of Event object
-  e.stopPropagation();
-  e.preventDefault();
-  console.log("hello, I'm mounted");
-};
-```
-
-Event delegation. You can assign handlers to `on(selector).event` to use
-[event delegation](https://www.geeksforgeeks.org/event-delegation-in-javascript/)
-pattern.
-
-```js
-import { component } from "https://deno.land/x/capsule@v0.6.1/dist.min.js";
-
-const { on } = component("my-component");
-
-on(".btn").click = ({ e }) => {
-  console.log(".btn is clicked!");
-};
-```
-
-Outside event handler. By assigning `on.outside.event`, you can handle the event
-outside of the component dom.
-
-```js
-import { component } from "https://deno.land/x/capsule@v0.6.1/dist.min.js";
-
-const { on } = component("my-component");
-
-on.outside.click = ({ e }) => {
-  console.log("The outside of my-component has been clicked!");
-};
-```
-
-# API reference
-
-```ts
-const { component, mount } from "https://deno.land/x/capsule@v0.6.1/dist.min.js";
-```
-
-## `component(name): ComponentResult`
-
-This registers the component of the given name. This returns a `ComponentResult`
-which has the following shape.
-
-```ts
-interface ComponentResult {
-  on: EventRegistryProxy;
-  is(name: string);
-  sub(type: string);
-  innerHTML(html: string);
-}
-
-interface EventRegistry {
-  [key: string]: EventHandler | {};
-  (selector: string): {
-    [key: string]: EventHandler;
-  };
-  outside: {
-    [key: string]: EventHandler;
-  };
-}
-```
-
-## `component().on[eventName] = EventHandler`
-
-You can register event handler by assigning to `on.event`.
-
-```ts
-const { on } = component("my-component");
-
-on.click = () => {
-  alert("clicked");
-};
-```
-
-## `component().on(selector)[eventName] = EventHandler`
-
-You can register event handler by assigning to `on(selector).event`.
-
-The actual event handler is attached to the component dom (the root of element
-which this component mounts), but the handler is only triggered when the target
-is inside the given `selector`.
-
-```ts
-const { on } = component("my-component");
-
-on(".btn").click = () => {
-  alert(".btn is clicked");
-};
-```
-
-## `component().on.outside[eventName] = EventHandler`
-
-You can register event handler for the outside of the component dom by assigning
-to `on.outside.event`
-
-```ts
-const { on } = component("my-component");
-
-on.outside.click = () => {
-  console.log("outside of the component has been clicked!");
-};
-```
-
-This is useful for implementing a tooltip which closes itself if the outside of
-it is clicked.
-
-## `component().is(name: string)`
-
-`is(name)` sets the html class to the component dom at `mount` phase.
-
-```ts
-const { is } = component("my-component");
-
-is("my-class-name");
-```
-
-## `component().innerHTML(html: string)`
-
-`innerHTML(html)` sets the inner html to the component dom at `mount` phase.
-
-```ts
-const { innerHTML } = component("my-component");
-
-innerHTML("<h1>Greetings!</h1><p>Hello from my-component</p>");
-```
-
-## `component().sub(type: string)`
-
-`sub(type)` sets the html class of the form `sub:type` to the component at
-`mount` phase. By adding `sub:type` class, the component can receive the event
-from `pub(type)` calls.
-
-```ts
-{
-  const { sub, on } = component("my-component");
-  sub("my-event");
-  on["my-event"] = () => {
-    alert("Got my-event");
-  };
-}
-{
-  const { on } = component("another-component");
-  on.click = ({ pub }) => {
-    pub("my-event");
-  };
-}
-```
-
-## `EventHandler`
-
-The event handler in `capsule` has the following signature. The first argument
-is `EventHandlerContext`, not `Event`.
-
-```ts
-type EventHandler = (ctx: ComponentEventContext) => void;
-```
-
-## `ComponentEventContext`
-
-```ts
-interface ComponentEventContext {
-  e: Event;
-  el: Element;
-  pub<T = unknown>(name: string, data: T): void;
-  query(selector: string): Element | null;
-  queryAll(selector: string): NodeListOf<Element> | null;
-}
-```
-
-`e` is the native DOM Event. You can call APIs like `.preventDefault()` or
-`.stopPropagation()` via this object.
-
-`el` is the DOM Element, which the event handler is bound to, and the event is
-dispatched on.
-
-You can optionally attach data to the event. The attached data is available via
-`.detail` property of `CustomEvent` object.
-
-`pub(type)` dispatches the event to the remote elements which have `sub:type`
-class. This should be used with `sub(type)` calls. For example:
-
-```ts
-{
-  const { sub, on } = component("my-component");
-  sub("my-event");
-  on["my-event"] = () => {
-    alert("Got my-event");
-  };
-}
-{
-  const { on } = component("another-component");
-  on.click = ({ pub }) => {
-    pub("my-event");
-  };
-}
-```
-
-This call dispatches `new CustomEvent("my-type")` to the elements which have
-`sub:my-type` class, like `<div class="sub:my-type"></div>`. The event doesn't
-bubbles up.
-
-This method is for communicating with the remote elements which aren't in
-parent-child relationship.
-
-## `mount(name?: string, el?: Element)`
-
-This function initializes the elements with the given configuration. `component`
-call itself initializes the component of the given class name automatically when
-document got ready, but if elements are added after the initial page load, you
-need to call this method explicitly to initialize capsule's event handlers.
-
-```js
-// Initializes the all components in the entire page.
-mount();
-
-// Initializes only "my-component" components in the entire page.
-// You can use this when you only added "my-component" component.
-mount("my-compnent");
-
-// Initializes the all components only in `myDom` element.
-// You can use this when you only added something under `myDom`.
-mount(undefined, myDom);
-
-// Initializes only "my-component" components only in `myDom` element.
-// You can use this when you only added "my-component" under `myDom`.
-mount("my-component", myDom);
-```
-
-## `unmount(name: string, el: Element)`
-
-This function unmounts the component of the given name from the element. This
-removes the all event listeners of the component and also calls the
-`__unmount__` hooks.
-
-```js
-const { on } = component("my-component");
-
-on.__unmount__ = () => {
-  console.log("unmounting!");
-};
-
-unmount("my-component", el);
-```
-
-Note: It's ok to just remove the mounted elements without calling `unmount`.
-Such removals don't cause a problem in most cases, but if you use `outside`
-handlers, you need to call unmount to prevent the leakage of the event handler
-because outside handlers are bound to `document` object.
-
-# How `capsule` works
-
-This section describes how `capsule` works in a big picture.
-
-Let's look at the below basic example.
-
-```js
-const { on } = component("my-component");
-
-on.click = () => {
-  console.log("clicked");
-};
-```
-
-This code is roughly translated into jQuery like the below:
-
-```js
-$(document).read(() => {
-  $(".my-component").each(function () {
-    $this = $(this);
-
-    if (isAlreadyInitialized($this)) {
-      return;
-    }
-
-    $this.click(() => {
-      console.log("clicked");
-    });
-  });
-});
-```
-
-`capsule` can be seen as a syntax sugar for the above pattern (with a few more
-utilities).
-
 # Prior art
 
+- [capsule](https://github.com/capsidjs/capsule)
 - [capsid](https://github.com/capsidjs/capsid)
-  - `capsule` is heavily inspired by `capsid`
 
 # Projects with similar concepts
 
@@ -560,12 +342,7 @@ utilities).
 
 # History
 
-- 2022-01-13 v0.5.2 Change `el` typing. #2
-- 2022-01-12 v0.5.1 Fix `__mount__` hook execution order
-- 2022-01-12 v0.5.0 Add tests, setup CI.
-- 2022-01-11 v0.4.0 Add outside handlers.
-- 2022-01-11 v0.3.0 Add `unmount`.
-- 2022-01-11 v0.2.0 Change delegation syntax.
+- 2024-06-18 Forked from capsule.
 
 # License
 
