@@ -17,7 +17,7 @@
 ## TodoMVC
 
 TodoMVC implementation is also available
-[here](https://github.com/kt3k/cell-todomvc) (WIP).
+[here](https://github.com/kt3k/cell-todomvc).
 
 ## Live examples
 
