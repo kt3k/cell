@@ -61,7 +61,7 @@ Vanilla js (ES Module):
 <script type="module">
 import { register } from "https://kt3k.github.io/cell/dist.min.js";
 
-function Mirroring({ on, query }: Context) {
+function Mirroring({ on, query }) {
   on.input = () => {
     query(".dest").textContent = query(".src").value;
   };
