@@ -3,9 +3,8 @@
 const READY_STATE_CHANGE = "readystatechange";
 
 let p: Promise<void>;
-export function documentReady() {
-  return p = p || new Promise<void>((resolve) => {
-    const doc = document;
+export function documentReady(doc = document) {
+  p ??= new Promise<void>((resolve) => {
     const checkReady = () => {
       if (doc.readyState === "complete") {
         resolve();
@@ -17,6 +16,7 @@ export function documentReady() {
 
     checkReady();
   });
+  return p;
 }
 
 interface LogEventMessage {

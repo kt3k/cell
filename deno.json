@@ -9,8 +9,8 @@
   },
   "exclude": ["docs/dist.js", "docs/dist.min.js"],
   "tasks": {
-    "test": "deno test -A",
-    "cov": "deno test --coverage -A",
+    "test": "deno test",
+    "cov": "deno test --coverage",
     "lcov": "deno coverage --lcov cov > lcov.info",
     "html_cov": "deno coverage --html",
     "dist": "deno run -A jsr:@kt3k/pack mod.ts > docs/dist.js",

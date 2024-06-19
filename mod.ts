@@ -104,7 +104,7 @@ export function register(component: Component, name: string) {
       // when deno_dom fixes add class.
       el.classList.add(name);
       el.classList.add(initClass);
-      el.addEventListener(`__ummount__:${name}`, () => {
+      el.addEventListener(`__unmount__:${name}`, () => {
         el.classList.remove(initClass);
       }, { once: true });
 
@@ -200,9 +200,13 @@ export function register(component: Component, name: string) {
 
   registry[name] = initializer;
 
-  documentReady().then(() => {
-    mount(name);
-  });
+  if (document.readyState === "complete") {
+    mount();
+  } else {
+    documentReady().then(() => {
+      mount(name);
+    });
+  }
 }
 
 function addEventListener(
