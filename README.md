@@ -17,11 +17,11 @@
 ## TodoMVC
 
 TodoMVC implementation is also available
-[here](https://github.com/kt3k/cell-todomvc).
+[here](https://github.com/kt3k/cell-todomvc) (WIP).
 
 ## Live examples
 
-See [the live demos](https://celljs.deno.dev/).
+See [the live demos](https://kt3k.github.io/cell).
 
 # Install
 
