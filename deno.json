@@ -11,7 +11,7 @@
   "tasks": {
     "test": "deno test",
     "cov": "deno test --coverage",
-    "lcov": "deno coverage --lcov cov > lcov.info",
+    "lcov": "deno coverage --lcov > lcov.info",
     "html_cov": "deno coverage --html",
     "dist": "deno run -A jsr:@kt3k/pack mod.ts > docs/dist.js",
     "min": "deno run -A npm:terser --compress --mangle --toplevel -o docs/dist.min.js -- docs/dist.js",
