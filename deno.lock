@@ -4,6 +4,7 @@
     "specifiers": {
       "jsr:@std/assert@^0.226.0": "jsr:@std/assert@0.226.0",
       "jsr:@std/internal@^1.0.0": "jsr:@std/internal@1.0.0",
+      "npm:superjson@1.13.3": "npm:superjson@1.13.3",
       "npm:terser": "npm:terser@5.31.0"
     },
     "jsr": {
@@ -64,6 +65,16 @@
         "integrity": "sha512-GpVkmM8vF2vQUkj2LvZmD35JxeJOLCwJ9cUkugyk2nuhbv3+mJvpLYYt+0+USMxE+oj+ey/lJEnhZw75x/OMcQ==",
         "dependencies": {}
       },
+      "copy-anything@3.0.5": {
+        "integrity": "sha512-yCEafptTtb4bk7GLEQoM8KVJpxAfdBJYaXyzQEgQQQgYrZiDp8SJmGKlYza6CYjEDNstAdNdKA3UuoULlEbS6w==",
+        "dependencies": {
+          "is-what": "is-what@4.1.16"
+        }
+      },
+      "is-what@4.1.16": {
+        "integrity": "sha512-ZhMwEosbFJkA0YhFnNDgTM4ZxDRsS6HqTo7qsZM08fehyRYIYa0yHu5R6mgo1n/8MgaPBXiPimPD77baVFYg+A==",
+        "dependencies": {}
+      },
       "source-map-support@0.5.21": {
         "integrity": "sha512-uBHU3L3czsIyYXKX88fdrGovxdSCoTGDRZ6SYXtSRxLZUzHg5P/66Ht6uoUlHu9EZod+inXhKo3qQgwXUT/y1w==",
         "dependencies": {
@@ -74,6 +85,12 @@
       "source-map@0.6.1": {
         "integrity": "sha512-UjgapumWlbMhkBgzT7Ykc5YXUT46F0iKu8SGXq0bcwP5dz/h0Plj6enJqjz1Zbq2l5WaqYnrVbwWOWMyF3F47g==",
         "dependencies": {}
+      },
+      "superjson@1.13.3": {
+        "integrity": "sha512-mJiVjfd2vokfDxsQPOwJ/PtanO87LhpYY88ubI5dUB1Ab58Txbyje3+jpm+/83R/fevaq/107NNhtYBLuoTrFg==",
+        "dependencies": {
+          "copy-anything": "copy-anything@3.0.5"
+        }
       },
       "terser@5.31.0": {
         "integrity": "sha512-Q1JFAoUKE5IMfI4Z/lkE/E6+SwgzO+x4tq4v1AyBLRj8VSYvRO6A/rQrPg1yud4g0En9EKI1TvFRF2tQFcoUkg==",
@@ -87,6 +104,8 @@
     }
   },
   "remote": {
+    "https://deno.land/std@0.203.0/dotenv/load.ts": "0636983549b98f29ab75c9a22a42d9723f0a389ece5498fe971e7bb2556a12e2",
+    "https://deno.land/std@0.203.0/dotenv/mod.ts": "1da8c6d0e7f7d8a5c2b19400b763bc11739df24acec235dda7ea2cfd3d300057",
     "https://raw.githubusercontent.com/b-fuze/deno-dom/9e4814e8d8117d8410fabb726d118e144e49fbf3/build/deno-wasm/deno-wasm.js": "20227e2c03e335411b4ee3d5bdd85bc6fb7b022520b6e870da4f9de92811e2fb",
     "https://raw.githubusercontent.com/b-fuze/deno-dom/9e4814e8d8117d8410fabb726d118e144e49fbf3/deno-dom-wasm.ts": "097cb6382dd8a335f9409e899873a103d7fbe7cbe06b32fd11b5bbc58305f6dc",
     "https://raw.githubusercontent.com/b-fuze/deno-dom/9e4814e8d8117d8410fabb726d118e144e49fbf3/src/api.ts": "48d7b7e6f41861b7a208615fdac3e3b5e80e69eda01fffe1c7c58630a3b1b901",

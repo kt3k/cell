@@ -2,7 +2,8 @@
 import { documentReady, logEvent } from "./util.ts";
 
 interface Initializer {
-  (el: HTMLElement): void;
+  // deno-lint-ignore no-explicit-any
+  (el: any): void;
   /** The elector for the component */
   sel: string;
 }
@@ -44,8 +45,8 @@ export interface Context<EL = HTMLElement> {
 }
 
 /** The component type */
-export type Component = <T extends HTMLElement>(
-  ctx: Context<T>,
+export type Component<EL extends HTMLElement> = (
+  ctx: Context<EL>,
 ) => string | undefined | void;
 
 /** The event handler type */
@@ -85,7 +86,10 @@ type MountHook = (el: HTMLElement) => void;
  * @param component The component function
  * @param name The component name
  */
-export function register(component: Component, name: string) {
+export function register<EL extends HTMLElement>(
+  component: Component<EL>,
+  name: string,
+) {
   assert(
     typeof name === "string" && !!name,
     "Component name must be a non-empty string",
@@ -98,7 +102,7 @@ export function register(component: Component, name: string) {
   const initClass = `${name}-💊`;
 
   /** Initializes the html element by the given configuration. */
-  const initializer = (el: HTMLElement) => {
+  const initializer = (el: EL) => {
     if (!el.classList.contains(initClass)) {
       // FIXME(kt3k): the below can be written as .add(name, initClass)
       // when deno_dom fixes add class.

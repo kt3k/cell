@@ -305,7 +305,7 @@ Deno.test("wrong type selector throws with on(selector).event", () => {
   register(Component, randomName());
 });
 
-Deno.test("register throws with non string input", () => {
+Deno.test("register() throws with non string input", () => {
   function Component() {}
   assertThrows(() => {
     // deno-lint-ignore no-explicit-any
@@ -337,7 +337,7 @@ Deno.test("register throws with non string input", () => {
   });
 });
 
-Deno.test("register throws with already registered name", () => {
+Deno.test("register() throws with already registered name", () => {
   const name = randomName();
   function Component() {}
   register(Component, name);
@@ -346,7 +346,7 @@ Deno.test("register throws with already registered name", () => {
   });
 });
 
-Deno.test("unmount with non registered name throws", () => {
+Deno.test("unmount() with non registered name throws", () => {
   assertThrows(() => {
     unmount(randomName(), document.body);
   });
@@ -375,3 +375,11 @@ const queryByClass = (name: string) => {
   assertExists(el);
   return el;
 };
+
+Deno.test("Component with narrower HTML element type works", () => {
+  function Component({ el }: Context<HTMLDivElement>) {
+    el.classList.add("foo");
+  }
+
+  register(Component, randomName());
+});
