@@ -33,6 +33,7 @@ const boldColor = (color: string): string =>
 const defaultEventColor = "#f012be";
 
 declare const __DEV__: boolean;
+declare const DEBUG_IGNORE: undefined | Set<string>;
 
 export function logEvent({
   component,
@@ -42,6 +43,8 @@ export function logEvent({
 }: LogEventMessage) {
   if (typeof __DEV__ === "boolean" && !__DEV__) return;
   const event = e.type;
+
+  if (typeof DEBUG_IGNORE === "object" && DEBUG_IGNORE?.has(event)) return;
 
   console.groupCollapsed(
     `${module}> %c${event}%c on %c${component}`,
