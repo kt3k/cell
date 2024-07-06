@@ -20,6 +20,7 @@
     "start": "deno run --allow-sys --allow-read=. --allow-net=0.0.0.0:8000 jsr:@std/http/file-server docs --port 8000"
   },
   "imports": {
+    "@b-fuze/deno-dom": "jsr:@b-fuze/deno-dom@^0.1.47",
     "@std/assert": "jsr:@std/assert@^0.226.0"
   }
 }

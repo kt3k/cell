@@ -1,4 +1,4 @@
-import { DOMParser } from "https://raw.githubusercontent.com/b-fuze/deno-dom/9e4814e8d8117d8410fabb726d118e144e49fbf3/deno-dom-wasm.ts";
+import { DOMParser } from "@b-fuze/deno-dom";
 // deno-lint-ignore no-explicit-any
 (globalThis as any).document = new DOMParser().parseFromString(
   "<body></body>",
