@@ -383,3 +383,13 @@ Deno.test("Component with narrower HTML element type works", () => {
 
   register(Component, randomName());
 });
+
+Deno.test("Returned string from Component is rendered", () => {
+  const name = randomName();
+  document.body.innerHTML = `<div class="${name}"><div>`;
+  function Component() {
+    return "<p>hello</p>";
+  }
+  register(Component, name);
+  assertEquals(queryByClass(name).innerHTML, "<p>hello</p>");
+});
