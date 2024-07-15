@@ -10,9 +10,7 @@
   "exclude": ["docs/dist.js", "docs/dist.min.js"],
   "tasks": {
     "test": "deno test",
-    "cov": "deno test --coverage",
-    "lcov": "deno coverage --lcov > lcov.info",
-    "html_cov": "deno coverage --html",
+    "cov": "deno test --coverage && deno coverage --html && deno coverage --lcov > lcov.info",
     "dist": "deno run -A jsr:@kt3k/pack mod.ts > docs/dist.js",
     "min": "deno run -A npm:terser --compress --mangle --toplevel -o docs/dist.min.js -- docs/dist.js",
     "size": "deno run --allow-read https://deno.land/x/gzip_size@v0.3.0/cli.ts --include-original docs/dist.min.js",
