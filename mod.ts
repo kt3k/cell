@@ -16,7 +16,10 @@ interface EventRegistry {
   };
   // deno-lint-ignore ban-types
   [key: string]: EventHandler | {};
-  (selector: string): {
+  (
+    selector: string | AddEventListenerOptions,
+    options?: AddEventListenerOptions,
+  ): {
     [key: string]: EventHandler;
   };
 }
@@ -78,10 +81,43 @@ function assertComponentNameIsValid(name: unknown): void {
   );
 }
 
-type MountHook = (el: HTMLElement) => void;
+/**
+ * Publishes the event to the elements which have `sub:event` class.
+ *
+ * @example Usage
+ *
+ * ```ts
+ * import { pub } from "@kt3k/cell";
+ *
+ * pub("event", { data: "data" });
+ * ```
+ *
+ * @param type The type of the event
+ * @param data The data of the event available via `event.detail`
+ */
+export function pub(type: string, data?: unknown) {
+  document.querySelectorAll(`.sub\\:${type}`).forEach((el) => {
+    el.dispatchEvent(
+      new CustomEvent(type, { bubbles: false, detail: data }),
+    );
+  });
+}
 
 /**
  * Register the component with the given name
+ *
+ * @example Usage
+ * ```ts
+ * import { register } from "@kt3k/cell";
+ *
+ * function Component({ on }) {
+ *   on.click = (e) => {
+ *     console.log("clicked");
+ *   };
+ * }
+ *
+ * register(Component, "my-component");
+ * ```
  *
  * @param component The component function
  * @param name The component name
@@ -152,34 +188,43 @@ export function register<EL extends HTMLElement>(
         },
         // event delegation handler (like on(".button").click = (e) => {}))
         apply(_target, _thisArg, args) {
-          const selector = args[0];
-          assert(
-            typeof selector === "string",
-            "Delegation selector must be a string. ${typeof selector} is given.",
-          );
-          return new Proxy({}, {
-            set(_: unknown, type: string, value: unknown): boolean {
-              addEventListener(
-                name,
-                el,
-                type,
-                // deno-lint-ignore no-explicit-any
-                value as any,
-                selector,
-              );
-              return true;
-            },
-          });
+          const arg0 = args[0];
+          // event delegation handler (like on(".button").click = (e) => {}))
+          if (typeof arg0 === "string") {
+            return new Proxy({}, {
+              set(_: unknown, type: string, value: unknown): boolean {
+                addEventListener(
+                  name,
+                  el,
+                  type,
+                  // deno-lint-ignore no-explicit-any
+                  value as any,
+                  arg0,
+                  args[1],
+                );
+                return true;
+              },
+            });
+          } else if (arg0 && typeof arg0 === "object") {
+            return new Proxy({}, {
+              set(_: unknown, type: string, value: unknown): boolean {
+                addEventListener(
+                  name,
+                  el,
+                  type,
+                  // deno-lint-ignore no-explicit-any
+                  value as any,
+                  undefined,
+                  arg0,
+                );
+                return true;
+              },
+            });
+          }
+          throw new Error(`Invalid on(...) call: ${typeof arg0} is given.`);
         },
       });
 
-      const pub = (type: string, data?: unknown) => {
-        document.querySelectorAll(`.sub\\:${type}`).forEach((el) => {
-          el.dispatchEvent(
-            new CustomEvent(type, { bubbles: false, detail: data }),
-          );
-        });
-      };
       const sub = (type: string) => el.classList.add(`sub:${type}`);
 
       const context = {
@@ -225,6 +270,7 @@ function addEventListener(
   type: string,
   handler: (e: Event) => void,
   selector?: string,
+  options?: AddEventListenerOptions,
 ) {
   assert(
     typeof handler === "function",
@@ -249,13 +295,20 @@ function addEventListener(
     }
   };
   el.addEventListener(`__unmount__:${name}`, () => {
-    el.removeEventListener(type, listener);
+    el.removeEventListener(type, listener, options);
   }, { once: true });
-  el.addEventListener(type, listener);
+  el.addEventListener(type, listener, options);
 }
 
 /**
  * Mount the components to the doms.
+ *
+ * @example Usage
+ * ```ts
+ * import { mount } from "@kt3k/cell";
+ *
+ * mount();
+ * ```
  *
  * @param name The component name to mount. If not given, all components are mounted.
  * @param el The elements of the children of this element will be initialied. If not given, the whole document is used.
@@ -281,6 +334,13 @@ export function mount(name?: string | null, el?: HTMLElement) {
 
 /**
  * Unmount the component from the dom.
+ *
+ * @example Usage
+ * ```ts
+ * import { unmount } from "@kt3k/cell";
+ *
+ * unmount("my-component", document.querySelector(".my-component"));
+ * ```
  *
  * @param name The component name to unmount.
  * @param el The element of the component to unmount.

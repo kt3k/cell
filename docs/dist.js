@@ -1,9 +1,8 @@
 // util.ts
 var READY_STATE_CHANGE = "readystatechange";
 var p;
-function documentReady() {
-  return p = p || new Promise((resolve) => {
-    const doc = document;
+function documentReady(doc = document) {
+  p ??= new Promise((resolve) => {
     const checkReady = () => {
       if (doc.readyState === "complete") {
         resolve();
@@ -13,6 +12,7 @@ function documentReady() {
     doc.addEventListener(READY_STATE_CHANGE, checkReady);
     checkReady();
   });
+  return p;
 }
 var boldColor = (color) => `color: ${color}; font-weight: bold;`;
 var defaultEventColor = "#f012be";
@@ -25,6 +25,8 @@ function logEvent({
   if (typeof __DEV__ === "boolean" && !__DEV__)
     return;
   const event = e.type;
+  if (typeof DEBUG_IGNORE === "object" && DEBUG_IGNORE?.has(event))
+    return;
   console.groupCollapsed(
     `${module}> %c${event}%c on %c${component}`,
     boldColor(color || defaultEventColor),
@@ -66,7 +68,7 @@ function register(component, name) {
     if (!el.classList.contains(initClass)) {
       el.classList.add(name);
       el.classList.add(initClass);
-      el.addEventListener(`__ummount__:${name}`, () => {
+      el.addEventListener(`__unmount__:${name}`, () => {
         el.classList.remove(initClass);
       }, { once: true });
       const on = new Proxy(() => {
@@ -107,24 +109,39 @@ function register(component, name) {
         },
         // event delegation handler (like on(".button").click = (e) => {}))
         apply(_target, _thisArg, args) {
-          const selector = args[0];
-          assert(
-            typeof selector === "string",
-            "Delegation selector must be a string. ${typeof selector} is given."
-          );
-          return new Proxy({}, {
-            set(_, type, value) {
-              addEventListener(
-                name,
-                el,
-                type,
-                // deno-lint-ignore no-explicit-any
-                value,
-                selector
-              );
-              return true;
-            }
-          });
+          const arg0 = args[0];
+          if (typeof arg0 === "string") {
+            return new Proxy({}, {
+              set(_, type, value) {
+                addEventListener(
+                  name,
+                  el,
+                  type,
+                  // deno-lint-ignore no-explicit-any
+                  value,
+                  arg0,
+                  args[1]
+                );
+                return true;
+              }
+            });
+          } else if (arg0 && typeof arg0 === "object") {
+            return new Proxy({}, {
+              set(_, type, value) {
+                addEventListener(
+                  name,
+                  el,
+                  type,
+                  // deno-lint-ignore no-explicit-any
+                  value,
+                  void 0,
+                  arg0
+                );
+                return true;
+              }
+            });
+          }
+          throw new Error(`Invalid on(...) call: ${typeof arg0} is given.`);
         }
       });
       const pub = (type, data) => {
@@ -146,22 +163,31 @@ function register(component, name) {
       const html = component(context);
       if (typeof html === "string") {
         el.innerHTML = html;
+      } else if (html && typeof html.then === "function") {
+        html.then((html2) => {
+          if (typeof html2 === "string") {
+            el.innerHTML = html2;
+          }
+        });
       }
     }
   };
   initializer.sel = `.${name}:not(.${initClass})`;
   registry[name] = initializer;
-  documentReady().then(() => {
-    mount(name);
-  });
+  if (document.readyState === "complete") {
+    mount();
+  } else {
+    documentReady().then(() => {
+      mount(name);
+    });
+  }
 }
-function addEventListener(name, el, type, handler, selector) {
+function addEventListener(name, el, type, handler, selector, options) {
   assert(
     typeof handler === "function",
     `Event handler must be a function, ${typeof handler} (${handler}) is given`
   );
   const listener = (e) => {
-    console.log("hi", e);
     if (!selector || [].some.call(
       el.querySelectorAll(selector),
       (node) => node === e.target || node.contains(e.target)
@@ -176,10 +202,9 @@ function addEventListener(name, el, type, handler, selector) {
     }
   };
   el.addEventListener(`__unmount__:${name}`, () => {
-    el.removeEventListener(type, listener);
+    el.removeEventListener(type, listener, options);
   }, { once: true });
-  console.log(`addEventListener(${type})`, handler);
-  el.addEventListener(type, listener);
+  el.addEventListener(type, listener, options);
 }
 function mount(name, el) {
   let classNames;
@@ -208,4 +233,4 @@ export {
   register,
   unmount
 };
-/*! Cell v0.1.4 | Copyright 2024 Yoshiya Hinosawa and Capsule contributors | MIT license */
+/*! Cell v0.1.8 | Copyright 2024 Yoshiya Hinosawa and Capsule contributors | MIT license */

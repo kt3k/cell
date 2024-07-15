@@ -139,6 +139,20 @@ Deno.test("on(selector)[event] is called when the event is dispatched only under
   assert(!onBtn2ClickCalled);
 });
 
+Deno.test("on(option)[event] is called with option as AddEventListnerOptions", async () => {
+  const name = randomName();
+  document.body.innerHTML = `<div class="${name}"></div>`;
+  let count = 0;
+  function Component({ on }: Context) {
+    on({ once: true }).click = () => count++;
+  }
+  register(Component, name);
+  const div = queryByClass(name);
+  div.dispatchEvent(new Event("click"));
+  div.dispatchEvent(new Event("click"));
+  assertEquals(count, 1);
+});
+
 Deno.test("on.outside.event works", () => {
   const name = randomName();
 
@@ -281,6 +295,8 @@ Deno.test("assign wrong type to on.event, on.outside.event, on(selector).event",
 });
 
 Deno.test("wrong type selector throws with on(selector).event", () => {
+  const name = randomName();
+  document.body.innerHTML = `<div class="${name}"><div>`;
   function Component({ on }: Context) {
     assertThrows(() => {
       // deno-lint-ignore no-explicit-any
@@ -292,18 +308,10 @@ Deno.test("wrong type selector throws with on(selector).event", () => {
     });
     assertThrows(() => {
       // deno-lint-ignore no-explicit-any
-      on({} as any);
-    });
-    assertThrows(() => {
-      // deno-lint-ignore no-explicit-any
-      on([] as any);
-    });
-    assertThrows(() => {
-      // deno-lint-ignore no-explicit-any
       on((() => {}) as any);
     });
   }
-  register(Component, randomName());
+  register(Component, name);
 });
 
 Deno.test("register() throws with non string input", () => {
