@@ -4,6 +4,7 @@
     "specifiers": {
       "jsr:@b-fuze/deno-dom@^0.1.47": "jsr:@b-fuze/deno-dom@0.1.47",
       "jsr:@std/assert@^0.226.0": "jsr:@std/assert@0.226.0",
+      "jsr:@std/async@^0.224.2": "jsr:@std/async@0.224.2",
       "jsr:@std/internal@^1.0.0": "jsr:@std/internal@1.0.1"
     },
     "jsr": {
@@ -16,6 +17,9 @@
           "jsr:@std/internal@^1.0.0"
         ]
       },
+      "@std/async@0.224.2": {
+        "integrity": "4d277d6e165df43d5e061ba0ef3edfddb8e8d558f5b920e3e6b1d2614b44d074"
+      },
       "@std/internal@1.0.1": {
         "integrity": "6f8c7544d06a11dd256c8d6ba54b11ed870aac6c5aeafff499892662c57673e6"
       }
@@ -25,7 +29,8 @@
   "workspace": {
     "dependencies": [
       "jsr:@b-fuze/deno-dom@^0.1.47",
-      "jsr:@std/assert@^0.226.0"
+      "jsr:@std/assert@^0.226.0",
+      "jsr:@std/async@^0.224.2"
     ]
   }
 }

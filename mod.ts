@@ -47,7 +47,7 @@ export interface Context<EL = HTMLElement> {
 /** The component type */
 export type Component<EL extends HTMLElement> = (
   ctx: Context<EL>,
-) => string | undefined | void;
+) => string | undefined | void | PromiseLike<void | string>;
 
 /** The event handler type */
 export type EventHandler = (e: Event) => void;
@@ -195,6 +195,12 @@ export function register<EL extends HTMLElement>(
       const html = component(context);
       if (typeof html === "string") {
         el.innerHTML = html;
+      } else if (html && typeof html.then === "function") {
+        html.then((html) => {
+          if (typeof html === "string") {
+            el.innerHTML = html;
+          }
+        });
       }
     }
   };

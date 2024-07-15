@@ -1,6 +1,7 @@
 // Copyright 2022 Yoshiya Hinosawa. All rights reserved. MIT license.
 
 import { assert, assertEquals, assertExists, assertThrows } from "@std/assert";
+import { delay } from "@std/async";
 import "./dom_polyfill.ts";
 import { type Context, mount, register, unmount } from "./mod.ts";
 
@@ -391,5 +392,16 @@ Deno.test("Returned string from Component is rendered", () => {
     return "<p>hello</p>";
   }
   register(Component, name);
+  assertEquals(queryByClass(name).innerHTML, "<p>hello</p>");
+});
+
+Deno.test("Resolved string from Component is rendered as innerHTML", async () => {
+  const name = randomName();
+  document.body.innerHTML = `<div class="${name}"><div>`;
+  function Component() {
+    return Promise.resolve("<p>hello</p>");
+  }
+  register(Component, name);
+  await delay(100);
   assertEquals(queryByClass(name).innerHTML, "<p>hello</p>");
 });
