@@ -54,6 +54,13 @@ function assertComponentNameIsValid(name) {
     `The component of the given name is not registered: ${name}`
   );
 }
+function pub(type, data) {
+  document.querySelectorAll(`.sub\\:${type}`).forEach((el) => {
+    el.dispatchEvent(
+      new CustomEvent(type, { bubbles: false, detail: data })
+    );
+  });
+}
 function register(component, name) {
   assert(
     typeof name === "string" && !!name,
@@ -144,13 +151,6 @@ function register(component, name) {
           throw new Error(`Invalid on(...) call: ${typeof arg0} is given.`);
         }
       });
-      const pub = (type, data) => {
-        document.querySelectorAll(`.sub\\:${type}`).forEach((el2) => {
-          el2.dispatchEvent(
-            new CustomEvent(type, { bubbles: false, detail: data })
-          );
-        });
-      };
       const sub = (type) => el.classList.add(`sub:${type}`);
       const context = {
         el,
@@ -230,7 +230,8 @@ function unmount(name, el) {
 }
 export {
   mount,
+  pub,
   register,
   unmount
 };
-/*! Cell v0.1.8 | Copyright 2024 Yoshiya Hinosawa and Capsule contributors | MIT license */
+/*! Cell v0.1.9 | Copyright 2024 Yoshiya Hinosawa and Capsule contributors | MIT license */

@@ -14,7 +14,6 @@ interface EventRegistry {
   outside: {
     [key: string]: EventHandler;
   };
-  // deno-lint-ignore ban-types
   [key: string]: EventHandler | {};
   (
     selector: string | AddEventListenerOptions,
@@ -53,7 +52,8 @@ export type Component<EL extends HTMLElement> = (
 ) => string | undefined | void | PromiseLike<void | string>;
 
 /** The event handler type */
-export type EventHandler = (e: Event) => void;
+// deno-lint-ignore no-explicit-any
+export type EventHandler = (e: any) => void;
 
 /** The registry of component initializers. */
 const registry: RegistryType = {};

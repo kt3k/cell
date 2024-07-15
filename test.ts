@@ -145,6 +145,8 @@ Deno.test("on(option)[event] is called with option as AddEventListnerOptions", (
   let count = 0;
   function Component({ on }: Context) {
     on({ once: true }).click = () => count++;
+    // for checking type
+    on({ passive: false }).touchmove = (_e: TouchEvent) => {};
   }
   register(Component, name);
   const div = queryByClass(name);
