@@ -139,7 +139,7 @@ Deno.test("on(selector)[event] is called when the event is dispatched only under
   assert(!onBtn2ClickCalled);
 });
 
-Deno.test("on(option)[event] is called with option as AddEventListnerOptions", async () => {
+Deno.test("on(option)[event] is called with option as AddEventListnerOptions", () => {
   const name = randomName();
   document.body.innerHTML = `<div class="${name}"></div>`;
   let count = 0;
