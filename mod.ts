@@ -14,6 +14,7 @@ interface EventRegistry {
   outside: {
     [key: string]: EventHandler;
   };
+  // deno-lint-ignore ban-types
   [key: string]: EventHandler | {};
   (
     selector: string | AddEventListenerOptions,
