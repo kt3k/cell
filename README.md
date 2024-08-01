@@ -4,7 +4,7 @@
 
 > Event-driven DOM programming in a new style
 
-# Features
+## Features
 
 - Cell encourages **event-driven** DOM programming in a new way
 - Supports **event delegation**
@@ -14,30 +14,28 @@
 - Uses **No special syntax**. Uses **plain JavaScript** and **plain HTML**
 - **TypeScript** friendly
 
+## Live examples
+
+See [the live demos](https://kt3k.github.io/cell).
+
 ## TodoMVC
 
 TodoMVC implementation is also available
 [here](https://github.com/kt3k/cell-todomvc).
 
-## Live examples
-
-See [the live demos](https://kt3k.github.io/cell).
-
-# Install
-
-Deno
-
-```
-deno add @kt3k/cell
-```
-
-Node
+## Install
 
 ```
 npx jsr add @kt3k/cell
 ```
 
-And
+Or, in Deno,
+
+```
+deno add @kt3k/cell
+```
+
+## Basic usages
 
 ```ts
 import { type Context, register } from "@kt3k/cell";
@@ -75,7 +73,7 @@ register(Mirroring, "js-mirroring");
 </div>
 ```
 
-# Examples
+## More examples
 
 Mirrors input value of `<input>` element to another dom.
 
@@ -164,7 +162,7 @@ function OutsideClickComponent({ on }: Context) {
 register(OutsideClickComponent, "js-outside-click");
 ```
 
-# How `cell` works
+## How `cell` works
 
 Let's look at the below basic example.
 
@@ -201,7 +199,7 @@ $(document).read(() => {
 `cell` can be seen as a syntax sugar for the above pattern (with a few more
 utilities).
 
-# Motivation
+## Motivation
 
 Virtual DOM frameworks are good for many use cases, but sometimes they are
 overkill for the use cases where you only need a little bit of event handlers
@@ -210,13 +208,13 @@ and dom modifications.
 This `cell` library explores the new way of simple event-driven DOM programming
 without virtual dom.
 
-# Slogans
+## Slogans
 
 - Local query is good. Global query is bad.
 - Define behaviors based on HTML classes.
 - Use pubsub when making remote effect.
 
-## Local query is good. Global query is bad
+### Local query is good. Global query is bad
 
 When people use jQuery, they often do:
 
@@ -275,7 +273,7 @@ function MyComponent({ on, query }: Context) {
 Here `query` is the alias of `el.querySelector` and it finds `.some-target` only
 under it. So the dependency is **local** here.
 
-## Define behaviors based on HTML classes
+### Define behaviors based on HTML classes
 
 From our observation, skilled jQuery developers always define DOM behaviors
 based on HTML classes.
@@ -295,7 +293,7 @@ function MyComponent({ on }: Context) {
 register(MyComponent, "js-hello");
 ```
 
-## Use pubsub when making remote effect
+### Use pubsub when making remote effect
 
 We generally recommend using only local queries, but how to make effects to the
 remote elements?
@@ -331,22 +329,22 @@ Note: `cell` uses DOM Event as event payload, and `sub:EVENT` HTML class as
 registration to the event. When `pub(EVENT)` is called the CustomEvent of
 `EVENT` type are dispatched to the elements which have `sub:EVENT` class.
 
-# Prior art
+## Prior art
 
 - [capsule](https://github.com/capsidjs/capsule)
 - [capsid](https://github.com/capsidjs/capsid)
 
-# Projects with similar concepts
+## Projects with similar concepts
 
 - [Flight](https://flightjs.github.io/) by twitter
   - Not under active development
 - [eddy.js](https://github.com/WebReflection/eddy)
   - Archived
 
-# History
+## History
 
 - 2024-06-18 Forked from capsule.
 
-# License
+## License
 
 MIT
