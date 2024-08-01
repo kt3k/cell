@@ -6,13 +6,13 @@
 
 # Features
 
-- Supports **event-driven** DOM programming in a new way.
-- Supports **event delegation**.
-- **Lightweight** library. **< 1.5 kiB** gzipped.
-- **No dependencies**.
-- **No build** step.
-- Uses **No special syntax**. Uses **plain JavaScript** and **plain HTML**.
-- **TypeScript** friendly.
+- Cell encourages **event-driven** DOM programming in a new way
+- Supports **event delegation**
+- **Lightweight** library (**< 1.5 kiB** gzipped)
+- ⭐️ **No dependencies**
+- 🌱 **No build** step required
+- Uses **No special syntax**. Uses **plain JavaScript** and **plain HTML**
+- **TypeScript** friendly
 
 ## TodoMVC
 
