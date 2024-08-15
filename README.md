@@ -13,6 +13,7 @@
 - 🌱 **No build** step required
 - Uses **No special syntax**. Uses **plain JavaScript** and **plain HTML**
 - **TypeScript** friendly
+- Use **signal** when you need remote effect
 
 ## Live examples
 
@@ -87,31 +88,6 @@ function Mirroring({ on, query }: Context) {
 }
 
 register(Mirroring, "js-mirroring");
-```
-
-Pubsub.
-
-```ts
-import { type Context, register } from "@kt3k/cell";
-
-const EVENT = "my-event";
-
-function PubComponent({ on, pub }: Context) {
-  on.click = () => {
-    pub(EVENT, { hello: "clicked!" });
-  };
-}
-
-function SubComponent({ on, sub, el }) {
-  sub(EVENT);
-
-  on[EVENT] = (e) => {
-    el.textContext += " " + e.detail.hello;
-  };
-}
-
-register(PubComponent, "js-pub");
-register(SubComponent, "js-sub");
 ```
 
 Prevent default, stop propagation.
@@ -212,7 +188,7 @@ without virtual dom.
 
 - Local query is good. Global query is bad.
 - Define behaviors based on HTML classes.
-- Use pubsub when making remote effect.
+- Use signal when making remote effect.
 
 ### Local query is good. Global query is bad
 
@@ -293,41 +269,18 @@ function MyComponent({ on }: Context) {
 register(MyComponent, "js-hello");
 ```
 
-### Use pubsub when making remote effect
+### Use signal when making remote effect
 
 We generally recommend using only local queries, but how to make effects to the
 remote elements?
 
-We reommend using pubsub pattern here. By using this pattern, you can decouple
+We reommend using signal pattern here. By using this pattern, you can decouple
 those affecting and affected elements. If you decouple those elements, you can
 test those components independently by using events as I/O of those components.
 
-`cell` library provides `pub` and `sub` APIs for encouraging this pattern.
+`cell` library provides `signal` API for supporting this pattern.
 
-```ts
-const EVENT = "my-event";
-
-function PubComponent({ on, pub }: Context) {
-  on.click = () => {
-    pub(EVENT);
-  };
-}
-
-function SubComponent({ on, sub }: Context) {
-  sub(EVENT); // This adds sub:my-event class to the mounted element, which means it subscribes to that event.
-
-  on[EVENT] = () => {
-    alert(`Got ${EVENT}!`);
-  };
-}
-
-register(PubComponent, "js-pub-component");
-register(SubComponent, "js-sub-component");
-```
-
-Note: `cell` uses DOM Event as event payload, and `sub:EVENT` HTML class as
-registration to the event. When `pub(EVENT)` is called the CustomEvent of
-`EVENT` type are dispatched to the elements which have `sub:EVENT` class.
+TBD
 
 ## Prior art
 

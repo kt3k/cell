@@ -3,26 +3,34 @@
   "packages": {
     "specifiers": {
       "jsr:@b-fuze/deno-dom@^0.1.47": "jsr:@b-fuze/deno-dom@0.1.47",
-      "jsr:@std/assert@^0.226.0": "jsr:@std/assert@0.226.0",
-      "jsr:@std/async@^0.224.2": "jsr:@std/async@0.224.2",
-      "jsr:@std/internal@^1.0.0": "jsr:@std/internal@1.0.1",
+      "jsr:@std/assert@^1.0.0": "jsr:@std/assert@1.0.2",
+      "jsr:@std/assert@^1.0.2": "jsr:@std/assert@1.0.2",
+      "jsr:@std/async@^1.0.0": "jsr:@std/async@1.0.3",
+      "jsr:@std/internal@^1.0.1": "jsr:@std/internal@1.0.1",
+      "jsr:@std/testing@^1.0.0": "jsr:@std/testing@1.0.0",
       "npm:terser": "npm:terser@5.31.1"
     },
     "jsr": {
       "@b-fuze/deno-dom@0.1.47": {
         "integrity": "270a888de91329f8ce3849211ece0ad97ce1e8b9a8a774f2bed2f43c8b0ffe8e"
       },
-      "@std/assert@0.226.0": {
-        "integrity": "0dfb5f7c7723c18cec118e080fec76ce15b4c31154b15ad2bd74822603ef75b3",
+      "@std/assert@1.0.2": {
+        "integrity": "ccacec332958126deaceb5c63ff8b4eaf9f5ed0eac9feccf124110435e59e49c",
         "dependencies": [
-          "jsr:@std/internal@^1.0.0"
+          "jsr:@std/internal@^1.0.1"
         ]
       },
-      "@std/async@0.224.2": {
-        "integrity": "4d277d6e165df43d5e061ba0ef3edfddb8e8d558f5b920e3e6b1d2614b44d074"
+      "@std/async@1.0.3": {
+        "integrity": "6ed64678db43451683c6c176a21426a2ccd21ba0269ebb2c36133ede3f165792"
       },
       "@std/internal@1.0.1": {
         "integrity": "6f8c7544d06a11dd256c8d6ba54b11ed870aac6c5aeafff499892662c57673e6"
+      },
+      "@std/testing@1.0.0": {
+        "integrity": "27cfc06392c69c2acffe54e6d0bcb5f961cf193f519255372bd4fff1481bfef8",
+        "dependencies": [
+          "jsr:@std/assert@^1.0.2"
+        ]
       }
     },
     "npm": {
@@ -98,8 +106,9 @@
   "workspace": {
     "dependencies": [
       "jsr:@b-fuze/deno-dom@^0.1.47",
-      "jsr:@std/assert@^0.226.0",
-      "jsr:@std/async@^0.224.2"
+      "jsr:@std/assert@^1.0.0",
+      "jsr:@std/async@^1.0.0",
+      "jsr:@std/testing@^1.0.0"
     ]
   }
 }

@@ -64,44 +64,6 @@ register(Hello, "js-hello");</pre>
   <hr class="my-10 -mx-2 lg:mx-2" />
 
   <section class="example">
-    <h2 class="text-lg font-medium">Pubsub example</h2>
-    <p>
-      <a href="https://github.com/kt3k/cell" class="bg-blue-50 text-blue-800 underline font-medium rounded border px-1 py-0.5">cell</a>
-      supports pubsub pattern with "pub" and "sub" methods.
-    </p>
-    <h3 class="mt-10">JS</h3>
-    <pre class="js-source overflow-x-scroll lg:rounded-lg shadow-lg bg-gray-800 text-gray-100 p-5 mt-5 -mx-2">const EVENT = "my-event";
-
-function PubComponent({ on, pub }) {
-  on.click = () => {
-    pub(EVENT, { hello: "clicked!" });
-  };
-}
-
-function SubComponent({ el, on, sub }) {
-  sub(EVENT);
-
-  on[EVENT] = (e) => {
-    el.textContent += " " + e.detail.hello;
-  };
-}
-
-register(PubComponent, "js-pub-component");
-register(SubComponent, "js-sub-component");</pre>
-    <template>
-<button class="js-pub-component border">publisher (click here)</button>
-<hr class="my-10" />
-<div class="js-sub-component border">subscriber</div>
-    </template>
-    <h3 class="mt-10">HTML</h3>
-    <pre class="html-source overflow-x-scroll lg:rounded-lg shadow-lg bg-gray-800 text-gray-100 p-5 mt-5 -mx-2"></pre>
-    <h3 class="mt-10">Result</h3>
-    <div class="result border rounded-lg p-5 mt-5"></div>
-  </section>
-
-  <hr class="my-10 -mx-2 lg:mx-2" />
-
-  <section class="example">
     <h2 class="text-lg font-medium">Event delegation example</h2>
     <p>
       Cell supports

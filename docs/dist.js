@@ -40,6 +40,70 @@ function logEvent({
   console.groupEnd();
 }
 
+// signal.ts
+var Signal = class {
+  #val;
+  #handlers = [];
+  constructor(value) {
+    this.#val = value;
+  }
+  /**
+   * Get the current value of the signal.
+   *
+   * @returns The current value of the signal
+   */
+  get() {
+    return this.#val;
+  }
+  /**
+   * Update the signal value.
+   *
+   * @param value The new value of the signal
+   */
+  update(value) {
+    if (this.#val !== value) {
+      this.#val = value;
+      this.#handlers.forEach((handler) => {
+        handler(value);
+      });
+    }
+  }
+  /**
+   * Update the signal value by comparing the fields of the new value.
+   *
+   * @param value The new value of the signal
+   */
+  updateByFields(value) {
+    if (typeof value !== "object" || value === null) {
+      throw new Error("value must be an object");
+    }
+    for (const key of Object.keys(value)) {
+      if (this.#val[key] !== value[key]) {
+        this.#val = { ...value };
+        this.#handlers.forEach((handler) => {
+          handler(this.#val);
+        });
+        break;
+      }
+    }
+  }
+  /**
+   * Subscribe to the signal.
+   *
+   * @param cb The callback function to be called when the signal is updated
+   * @returns A function to stop the subscription
+   */
+  onChange(cb) {
+    this.#handlers.push(cb);
+    return () => {
+      this.#handlers.splice(this.#handlers.indexOf(cb) >>> 0, 1);
+    };
+  }
+};
+function signal(value) {
+  return new Signal(value);
+}
+
 // mod.ts
 var registry = {};
 function assert(assertion, message) {
@@ -53,13 +117,6 @@ function assertComponentNameIsValid(name) {
     !!registry[name],
     `The component of the given name is not registered: ${name}`
   );
-}
-function pub(type, data) {
-  document.querySelectorAll(`.sub\\:${type}`).forEach((el) => {
-    el.dispatchEvent(
-      new CustomEvent(type, { bubbles: false, detail: data })
-    );
-  });
 }
 function register(component, name) {
   assert(
@@ -151,12 +208,9 @@ function register(component, name) {
           throw new Error(`Invalid on(...) call: ${typeof arg0} is given.`);
         }
       });
-      const sub = (type) => el.classList.add(`sub:${type}`);
       const context = {
         el,
         on,
-        pub,
-        sub,
         query: (s) => el.querySelector(s),
         queryAll: (s) => el.querySelectorAll(s)
       };
@@ -230,8 +284,8 @@ function unmount(name, el) {
 }
 export {
   mount,
-  pub,
   register,
+  signal,
   unmount
 };
-/*! Cell v0.1.9 | Copyright 2024 Yoshiya Hinosawa and Capsule contributors | MIT license */
+/*! Cell v0.1.10 | Copyright 2024 Yoshiya Hinosawa and Capsule contributors | MIT license */

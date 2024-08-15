@@ -24,25 +24,6 @@ Deno.test("Component body is called when the component is mounted", () => {
   assert(called);
 });
 
-Deno.test("sub() add sub:type class to the dom", () => {
-  const name = randomName();
-
-  document.body.innerHTML = `<div class="${name}"></div>`;
-  const div = queryByClass(name);
-
-  function Component({ el, sub }: Context) {
-    el.classList.add("foo");
-    sub("bar");
-    return "<p>hello</p>";
-  }
-
-  register(Component, name);
-
-  assert(div.classList.contains("foo"));
-  assert(div.classList.contains("sub:bar"));
-  assert(div.innerHTML === "<p>hello</p>");
-});
-
 /*
 Deno.test("on.__unmount__ is called when the componet is unmounted", () => {
   const name = randomName();
@@ -189,30 +170,6 @@ Deno.test("on.outside.event works", () => {
   sibling.dispatchEvent(new Event("click", { bubbles: true }));
   root.dispatchEvent(new Event("click", { bubbles: true }));
   assertEquals(calledCount, 2);
-});
-
-Deno.test("pub, sub works", () => {
-  const EVENT = "my-event";
-  const name1 = randomName();
-  const name2 = randomName();
-  let subCalled = false;
-  document.body.innerHTML = `
-    <div class="${name1}"></div>
-    <div class="${name2}"></div>
-  `;
-  function SubComponent({ on, sub }: Context) {
-    sub(EVENT);
-    on[EVENT] = () => {
-      subCalled = true;
-    };
-  }
-  function PubComponent({ pub }: Context) {
-    pub(EVENT);
-  }
-  register(SubComponent, name1);
-  assert(!subCalled);
-  register(PubComponent, name2);
-  assert(subCalled);
 });
 
 Deno.test("query, queryAll works", () => {

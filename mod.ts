@@ -1,5 +1,6 @@
 /*! Cell v0.1.10 | Copyright 2024 Yoshiya Hinosawa and Capsule contributors | MIT license */
 import { documentReady, logEvent } from "./util.ts";
+export { signal } from "./signal.ts";
 
 interface Initializer {
   // deno-lint-ignore no-explicit-any
@@ -34,11 +35,6 @@ export interface Context<EL = HTMLElement> {
   el: EL;
   /** The event registry. You can register event listener on `el` easily with this helper. */
   on: EventRegistry;
-  /** Publishes the event. Events are delivered to elements which have `sub:event` class.
-   * The dispatched events don't bubbles up */
-  pub<T = unknown>(event: string, data?: T): void;
-  /** Add sub:event class to the component element */
-  sub(event: string): void;
   /** Queries elements by the given selector under the component dom */
   query<T extends HTMLElement = HTMLElement>(selector: string): T | null;
   /** Queries all elements by the given selector under the component dom */
@@ -80,28 +76,6 @@ function assertComponentNameIsValid(name: unknown): void {
     !!registry[name as string],
     `The component of the given name is not registered: ${name}`,
   );
-}
-
-/**
- * Publishes the event to the elements which have `sub:event` class.
- *
- * @example Usage
- *
- * ```ts
- * import { pub } from "@kt3k/cell";
- *
- * pub("event", { data: "data" });
- * ```
- *
- * @param type The type of the event
- * @param data The data of the event available via `event.detail`
- */
-export function pub(type: string, data?: unknown) {
-  document.querySelectorAll(`.sub\\:${type}`).forEach((el) => {
-    el.dispatchEvent(
-      new CustomEvent(type, { bubbles: false, detail: data }),
-    );
-  });
 }
 
 /**
@@ -226,13 +200,9 @@ export function register<EL extends HTMLElement>(
         },
       });
 
-      const sub = (type: string) => el.classList.add(`sub:${type}`);
-
       const context = {
         el,
         on,
-        pub,
-        sub,
         query: <T extends HTMLElement = HTMLElement>(s: string) =>
           el.querySelector(s) as T | null,
         queryAll: <T extends HTMLElement = HTMLElement>(s: string) =>
