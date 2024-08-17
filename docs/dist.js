@@ -40,7 +40,7 @@ function logEvent({
   console.groupEnd();
 }
 
-// signal.ts
+// https://jsr.io/@kt3k/signal/0.1.6/mod.ts
 var Signal = class {
   #val;
   #handlers = [];
@@ -288,4 +288,4 @@ export {
   signal,
   unmount
 };
-/*! Cell v0.2.0 | Copyright 2024 Yoshiya Hinosawa and Capsule contributors | MIT license */
+/*! Cell v0.2.1 | Copyright 2024 Yoshiya Hinosawa and Capsule contributors | MIT license */

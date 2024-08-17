@@ -3,6 +3,7 @@
   "packages": {
     "specifiers": {
       "jsr:@b-fuze/deno-dom@^0.1.47": "jsr:@b-fuze/deno-dom@0.1.47",
+      "jsr:@kt3k/signal@^0.1.6": "jsr:@kt3k/signal@0.1.6",
       "jsr:@std/assert@^1.0.0": "jsr:@std/assert@1.0.2",
       "jsr:@std/assert@^1.0.2": "jsr:@std/assert@1.0.2",
       "jsr:@std/async@^1.0.0": "jsr:@std/async@1.0.3",
@@ -13,6 +14,9 @@
     "jsr": {
       "@b-fuze/deno-dom@0.1.47": {
         "integrity": "270a888de91329f8ce3849211ece0ad97ce1e8b9a8a774f2bed2f43c8b0ffe8e"
+      },
+      "@kt3k/signal@0.1.6": {
+        "integrity": "e9351a127d2977f6e9469c884fd5289592a4766a09974ae5e84d6ce501abc10f"
       },
       "@std/assert@1.0.2": {
         "integrity": "ccacec332958126deaceb5c63ff8b4eaf9f5ed0eac9feccf124110435e59e49c",
@@ -106,6 +110,7 @@
   "workspace": {
     "dependencies": [
       "jsr:@b-fuze/deno-dom@^0.1.47",
+      "jsr:@kt3k/signal@^0.1.6",
       "jsr:@std/assert@^1.0.0",
       "jsr:@std/async@^1.0.0",
       "jsr:@std/testing@^1.0.0"

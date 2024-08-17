@@ -2,18 +2,14 @@
 
 # Cell v0.2.1
 
-> Event-driven DOM programming in a new style
+> frontend tool for local event handlers and signals
 
 ## Features
 
-- Cell encourages **event-driven** DOM programming in a new way
-- Supports **event delegation**
-- **Lightweight** library (**< 1.5 kiB** gzipped)
-- ⭐️ **No dependencies**
-- 🌱 **No build** step required
-- Uses **No special syntax**. Uses **plain JavaScript** and **plain HTML**
+- Cell encourages **local event handlers**
+- Cell provides **signals** for remote effects
+- **Lightweight** (**< 1.5 kiB** gzipped)
 - **TypeScript** friendly
-- Use **signal** when you need remote effect
 
 ## Live examples
 
@@ -52,26 +48,6 @@ register(MyComponent, "js-hello");
 
 ```
 <div class="js-hello">Click</div>
-```
-
-Vanilla js (ES Module):
-
-```html
-<script type="module">
-import { register } from "https://kt3k.github.io/cell/dist.min.js";
-
-function Mirroring({ on, query }) {
-  on.input = () => {
-    query(".dest").textContent = query(".src").value;
-  };
-}
-
-register(Mirroring, "js-mirroring");
-</script>
-<div class="js-mirroring">
-  <input class="src" placeholder="Type something" />
-  <p class="dest"></p>
-</div>
 ```
 
 ## More examples
@@ -174,6 +150,26 @@ $(document).read(() => {
 
 `cell` can be seen as a syntax sugar for the above pattern (with a few more
 utilities).
+
+## Using Cell directly from the browser
+
+```html
+<script type="module">
+import { register } from "https://kt3k.github.io/cell/dist.min.js";
+
+function Mirroring({ on, query }) {
+  on.input = () => {
+    query(".dest").textContent = query(".src").value;
+  };
+}
+
+register(Mirroring, "js-mirroring");
+</script>
+<div class="js-mirroring">
+  <input class="src" placeholder="Type something" />
+  <p class="dest"></p>
+</div>
+```
 
 ## Motivation
 

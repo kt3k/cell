@@ -1,6 +1,6 @@
 /*! Cell v0.2.1 | Copyright 2024 Yoshiya Hinosawa and Capsule contributors | MIT license */
 import { documentReady, logEvent } from "./util.ts";
-export { signal } from "./signal.ts";
+export { signal } from "@kt3k/signal";
 
 interface Initializer {
   // deno-lint-ignore no-explicit-any
