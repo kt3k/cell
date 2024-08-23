@@ -12,6 +12,97 @@ interface RegistryType {
   [key: string]: Initializer
 }
 
+type EventType =
+  | "click"
+  | "dblclick"
+  | "mousedown"
+  | "mouseup"
+  | "mouseover"
+  | "mousemove"
+  | "mouseout"
+  | "dragstart"
+  | "drag"
+  | "dragenter"
+  | "dragleave"
+  | "dragover"
+  | "drop"
+  | "dragend"
+  | "keydown"
+  | "keypress"
+  | "keyup"
+  | "load"
+  | "unload"
+  | "abort"
+  | "error"
+  | "resize"
+  | "scroll"
+  | "select"
+  | "change"
+  | "submit"
+  | "reset"
+  | "focus"
+  | "blur"
+  | "change"
+  | "input"
+  | "submit"
+  | "load"
+  | "unload"
+  | "resize"
+  | "scroll"
+  | "select"
+  | "error"
+  | "contextmenu"
+  | "touchstart"
+  | "touchend"
+  | "touchmove"
+  | "touchenter"
+  | "touchleave"
+  | "touchcancel"
+
+type EventMap = {
+  click: MouseEvent
+  dblclick: MouseEvent
+  mousedown: MouseEvent
+  mouseup: MouseEvent
+  mousemove: MouseEvent
+  mouseover: MouseEvent
+  mouseout: MouseEvent
+  dragstart: DragEvent
+  drag: DragEvent
+  dragenter: DragEvent
+  dragleave: DragEvent
+  dragover: DragEvent
+  drop: DragEvent
+  dragend: DragEvent
+  keydown: KeyboardEvent
+  keyup: KeyboardEvent
+  keypress: KeyboardEvent
+  load: Event
+  unload: Event
+  abort: Event
+  error: ErrorEvent
+  resize: Event
+  scroll: Event
+  select: Event
+  change: Event
+  submit: Event
+  reset: Event
+  focus: FocusEvent
+  blur: FocusEvent
+  input: InputEvent
+  contextmenu: MouseEvent
+  touchstart: TouchEvent
+  touchend: TouchEvent
+  touchmove: TouchEvent
+  touchenter: TouchEvent
+  touchleave: TouchEvent
+  touchcancel: TouchEvent
+}
+
+type EventHandler<T extends EventType | string> = (
+  e: T extends EventType ? EventMap[T] : CustomEvent,
+) => void
+
 /**
  * The context of the component. This context is passed as the first argument to the component function for each mount.
  *
@@ -21,24 +112,31 @@ export interface Context<EL = HTMLElement> {
   /** The element */
   el: EL
   /** Registers the event listener */
-  on(type: string, handler: EventHandler): void
+  on<T extends EventType | string>(type: T, handler: EventHandler<T>): void
   /** Registers the event listener */
-  on(type: string, selector: string, handler: EventHandler): void
-  /** Registers the event listener */
-  on(
-    type: string,
-    options: AddEventListenerOptions,
-    handler: EventHandler,
+  on<T extends EventType | string>(
+    type: T,
+    selector: string,
+    handler: EventHandler<T>,
   ): void
   /** Registers the event listener */
-  on(
-    type: string,
+  on<T extends EventType | string>(
+    type: T,
+    options: AddEventListenerOptions,
+    handler: EventHandler<T>,
+  ): void
+  /** Registers the event listener */
+  on<T extends EventType | string>(
+    type: T,
     selector: string,
     options: AddEventListenerOptions,
-    handler: EventHandler,
+    handler: EventHandler<T>,
   ): void
   /** Registers the event listener for the outside of the element */
-  onOutside(type: string, handler: EventHandler): void
+  onOutside<T extends EventType | string>(
+    type: T,
+    handler: EventHandler<T>,
+  ): void
   /** Queries elements by the given selector under the component dom */
   query<T extends HTMLElement = HTMLElement>(selector: string): T | null
   /** Queries all elements by the given selector under the component dom */
@@ -51,10 +149,6 @@ export interface Context<EL = HTMLElement> {
 export type Component<EL extends HTMLElement> = (
   ctx: Context<EL>,
 ) => string | undefined | void | PromiseLike<void | string>
-
-/** The event handler type */
-// deno-lint-ignore no-explicit-any
-export type EventHandler = (e: any) => void
 
 /** The registry of component initializers. */
 const registry: RegistryType = {}
@@ -221,7 +315,8 @@ export function register<EL extends HTMLElement>(
   }
 }
 
-function assertEventHandler(handler: unknown): asserts handler is EventHandler {
+// deno-lint-ignore ban-types
+function assertEventHandler(handler: unknown): asserts handler is Function {
   assert(
     typeof handler === "function",
     `Cannot add an event listener: The event handler must be a function, ${typeof handler} (${handler}) is given`,

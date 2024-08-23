@@ -50,7 +50,7 @@ Deno.test("unmount removes the event listeners", () => {
 
   let count = 0
   function Component({ on }: Context) {
-    on("my-event", () => {
+    on("my-event", (_e) => {
       count++
     })
   }
@@ -123,9 +123,9 @@ Deno.test("on(option)[event] is called with option as AddEventListnerOptions", (
   document.body.innerHTML = `<div class="${name}"></div>`
   let count = 0
   function Component({ on }: Context) {
-    on("click", { once: true }, () => count++)
+    on("click", { once: true }, (_e) => count++)
     // for checking type
-    on("touchmove", { passive: false }, (_e: TouchEvent) => {})
+    on("touchmove", { passive: false }, (_e) => {})
   }
   register(Component, name)
   const div = queryByClass(name)
