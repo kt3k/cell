@@ -55,7 +55,7 @@ function MyComponent({ on }: Context) {
 register(MyComponent, "js-hello")
 ```
 
-```
+```html
 <button class="js-hello">Click</button>
 ```
 
@@ -80,7 +80,7 @@ function Mirroring({ on, query }: Context) {
 register(Mirroring, "js-mirroring")
 ```
 
-```
+```html
 <div class="js-mirroring">
   <input class="src" placeholder="type something" />
   <p class="dest"></p>
