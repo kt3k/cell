@@ -35,15 +35,15 @@ deno add @kt3k/cell
 ## Hello world
 
 ```ts
-import { type Context, register } from "@kt3k/cell";
+import { type Context, register } from "@kt3k/cell"
 
 function MyComponent({ on }: Context) {
   on("click", () => {
-    alert("hello");
-  });
+    alert("hello")
+  })
 }
 
-register(MyComponent, "js-hello");
+register(MyComponent, "js-hello")
 ```
 
 ```
@@ -58,15 +58,15 @@ The next component mirrors the input value of `<input>` element to another DOM
 element.
 
 ```ts
-import { type Context, register } from "@kt3k/cell";
+import { type Context, register } from "@kt3k/cell"
 
 function Mirroring({ on, query }: Context) {
   on("input", () => {
-    query(".dest").textContent = query(".src").value;
-  });
+    query(".dest").textContent = query(".src").value
+  })
 }
 
-register(Mirroring, "js-mirroring");
+register(Mirroring, "js-mirroring")
 ```
 
 ```
@@ -100,15 +100,15 @@ By calling `on.outside(event, handler)`, you can handle the event outside of the
 component's DOM.
 
 ```ts
-import { type Context, register } from "@kt3k/cell";
+import { type Context, register } from "@kt3k/cell"
 
 function OutsideClickComponent({ on }: Context) {
   on.outside("click", ({ e }) => {
-    console.log("The outside of my-component has been clicked!");
-  });
+    console.log("The outside of my-component has been clicked!")
+  })
 }
 
-register(OutsideClickComponent, "js-outside-click");
+register(OutsideClickComponent, "js-outside-click")
 ```
 
 ## Using Cell directly from the browser

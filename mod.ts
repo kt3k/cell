@@ -1,15 +1,15 @@
 /*! Cell v0.3.0 | Copyright 2024 Yoshiya Hinosawa and Capsule contributors | MIT license */
-import { documentReady, logEvent } from "./util.ts";
-export { signal } from "@kt3k/signal";
+import { documentReady, logEvent } from "./util.ts"
+export { signal } from "@kt3k/signal"
 
 interface Initializer {
   // deno-lint-ignore no-explicit-any
-  (el: any): void;
+  (el: any): void
   /** The elector for the component */
-  sel: string;
+  sel: string
 }
 interface RegistryType {
-  [key: string]: Initializer;
+  [key: string]: Initializer
 }
 
 /**
@@ -19,45 +19,45 @@ interface RegistryType {
  */
 export interface Context<EL = HTMLElement> {
   /** The element */
-  el: EL;
+  el: EL
   /** Registers the event listener */
-  on(type: string, handler: EventHandler): void;
+  on(type: string, handler: EventHandler): void
   /** Registers the event listener */
-  on(type: string, selector: string, handler: EventHandler): void;
+  on(type: string, selector: string, handler: EventHandler): void
   /** Registers the event listener */
   on(
     type: string,
     options: AddEventListenerOptions,
     handler: EventHandler,
-  ): void;
+  ): void
   /** Registers the event listener */
   on(
     type: string,
     selector: string,
     options: AddEventListenerOptions,
     handler: EventHandler,
-  ): void;
+  ): void
   /** Registers the event listener for the outside of the element */
-  onOutside(type: string, handler: EventHandler): void;
+  onOutside(type: string, handler: EventHandler): void
   /** Queries elements by the given selector under the component dom */
-  query<T extends HTMLElement = HTMLElement>(selector: string): T | null;
+  query<T extends HTMLElement = HTMLElement>(selector: string): T | null
   /** Queries all elements by the given selector under the component dom */
   queryAll<T extends HTMLElement = HTMLElement>(
     selector: string,
-  ): NodeListOf<T>;
+  ): NodeListOf<T>
 }
 
 /** The component type */
 export type Component<EL extends HTMLElement> = (
   ctx: Context<EL>,
-) => string | undefined | void | PromiseLike<void | string>;
+) => string | undefined | void | PromiseLike<void | string>
 
 /** The event handler type */
 // deno-lint-ignore no-explicit-any
-export type EventHandler = (e: any) => void;
+export type EventHandler = (e: any) => void
 
 /** The registry of component initializers. */
-const registry: RegistryType = {};
+const registry: RegistryType = {}
 
 /**
  * Asserts the given condition holds, otherwise throws.
@@ -66,7 +66,7 @@ const registry: RegistryType = {};
  */
 function assert(assertion: boolean, message: string): void {
   if (!assertion) {
-    throw new Error(message);
+    throw new Error(message)
   }
 }
 
@@ -75,11 +75,11 @@ function assert(assertion: boolean, message: string): void {
  * @param name The component name
  */
 function assertComponentNameIsValid(name: unknown): void {
-  assert(typeof name === "string", "The name should be a string");
+  assert(typeof name === "string", "The name should be a string")
   assert(
     !!registry[name as string],
     `The component of the given name is not registered: ${name}`,
-  );
+  )
 }
 
 /**
@@ -108,24 +108,24 @@ export function register<EL extends HTMLElement>(
   assert(
     typeof name === "string" && !!name,
     "Component name must be a non-empty string",
-  );
+  )
   assert(
     !registry[name],
     `The component of the given name is already registered: ${name}`,
-  );
+  )
 
-  const initClass = `${name}-💊`;
+  const initClass = `${name}-💊`
 
   /** Initializes the html element by the given configuration. */
   const initializer = (el: EL) => {
     if (!el.classList.contains(initClass)) {
       // FIXME(kt3k): the below can be written as .add(name, initClass)
       // when deno_dom fixes add class.
-      el.classList.add(name);
-      el.classList.add(initClass);
+      el.classList.add(name)
+      el.classList.add(initClass)
       el.addEventListener(`__unmount__:${name}`, () => {
-        el.classList.remove(initClass);
-      }, { once: true });
+        el.classList.remove(initClass)
+      }, { once: true })
 
       const on = (
         type: string,
@@ -138,35 +138,35 @@ export function register<EL extends HTMLElement>(
       ) => {
         // normailize arguments
         if (typeof selector === "function") {
-          handler = selector;
-          selector = undefined;
-          options = undefined;
+          handler = selector
+          selector = undefined
+          options = undefined
         } else if (
           typeof options === "function" && typeof selector === "string"
         ) {
-          handler = options;
-          options = undefined;
+          handler = options
+          options = undefined
         } else if (
           typeof options === "function" && typeof selector === "object"
         ) {
-          handler = options;
-          options = selector;
-          selector = undefined;
+          handler = options
+          options = selector
+          selector = undefined
         }
 
         if (typeof handler !== "function") {
           throw new Error(
             `Cannot add event listener: The handler must be a function, but ${typeof handler} is given`,
-          );
+          )
         }
 
-        addEventListener(name, el, type, handler, selector, options);
-      };
+        addEventListener(name, el, type, handler, selector, options)
+      }
 
       // deno-lint-ignore no-explicit-any
       const onOutside = (type: string, handler: (e: any) => void) => {
-        assertEventType(type);
-        assertEventHandler(handler);
+        assertEventType(type)
+        assertEventHandler(handler)
         const listener = (e: Event) => {
           // deno-lint-ignore no-explicit-any
           if (el !== e.target && !el.contains(e.target as any)) {
@@ -175,15 +175,15 @@ export function register<EL extends HTMLElement>(
               color: "#39cccc",
               e,
               component: name,
-            });
-            handler(e);
+            })
+            handler(e)
           }
-        };
-        document.addEventListener(type, listener);
+        }
+        document.addEventListener(type, listener)
         el.addEventListener(`__unmount__:${name}`, () => {
-          document.removeEventListener(type, listener);
-        }, { once: true });
-      };
+          document.removeEventListener(type, listener)
+        }, { once: true })
+      }
 
       const context = {
         el,
@@ -193,31 +193,31 @@ export function register<EL extends HTMLElement>(
           el.querySelector(s) as T | null,
         queryAll: <T extends HTMLElement = HTMLElement>(s: string) =>
           el.querySelectorAll(s) as NodeListOf<T>,
-      };
-      const html = component(context);
+      }
+      const html = component(context)
       if (typeof html === "string") {
-        el.innerHTML = html;
+        el.innerHTML = html
       } else if (html && typeof html.then === "function") {
         html.then((html) => {
           if (typeof html === "string") {
-            el.innerHTML = html;
+            el.innerHTML = html
           }
-        });
+        })
       }
     }
-  };
+  }
 
   // The selector
-  initializer.sel = `.${name}:not(.${initClass})`;
+  initializer.sel = `.${name}:not(.${initClass})`
 
-  registry[name] = initializer;
+  registry[name] = initializer
 
   if (document.readyState === "complete") {
-    mount();
+    mount()
   } else {
     documentReady().then(() => {
-      mount(name);
-    });
+      mount(name)
+    })
   }
 }
 
@@ -225,14 +225,14 @@ function assertEventHandler(handler: unknown): asserts handler is EventHandler {
   assert(
     typeof handler === "function",
     `Cannot add an event listener: The event handler must be a function, ${typeof handler} (${handler}) is given`,
-  );
+  )
 }
 
 function assertEventType(type: unknown): asserts type is string {
   assert(
     typeof type === "string",
     `Cannot add an event listener: The event type must be a string, ${typeof type} (${type}) is given`,
-  );
+  )
 }
 
 function addEventListener(
@@ -243,8 +243,8 @@ function addEventListener(
   selector?: string,
   options?: AddEventListenerOptions,
 ) {
-  assertEventType(type);
-  assertEventHandler(handler);
+  assertEventType(type)
+  assertEventHandler(handler)
 
   const listener = (e: Event) => {
     if (
@@ -259,14 +259,14 @@ function addEventListener(
         color: "#e0407b",
         e,
         component: name,
-      });
-      handler(e);
+      })
+      handler(e)
     }
-  };
+  }
   el.addEventListener(`__unmount__:${name}`, () => {
-    el.removeEventListener(type, listener, options);
-  }, { once: true });
-  el.addEventListener(type, listener, options);
+    el.removeEventListener(type, listener, options)
+  }, { once: true })
+  el.addEventListener(type, listener, options)
 }
 
 /**
@@ -283,22 +283,22 @@ function addEventListener(
  * @param el The elements of the children of this element will be initialied. If not given, the whole document is used.
  */
 export function mount(name?: string | null, el?: HTMLElement) {
-  let classNames: string[];
+  let classNames: string[]
 
   if (!name) {
-    classNames = Object.keys(registry);
+    classNames = Object.keys(registry)
   } else {
-    assertComponentNameIsValid(name);
+    assertComponentNameIsValid(name)
 
-    classNames = [name];
+    classNames = [name]
   }
 
   classNames.map((className) => {
-    [].map.call(
+    ;[].map.call(
       (el || document).querySelectorAll(registry[className].sel),
       registry[className],
-    );
-  });
+    )
+  })
 }
 
 /**
@@ -318,6 +318,6 @@ export function unmount(name: string, el: HTMLElement) {
   assert(
     !!registry[name],
     `The component of the given name is not registered: ${name}`,
-  );
-  el.dispatchEvent(new CustomEvent(`__unmount__:${name}`));
+  )
+  el.dispatchEvent(new CustomEvent(`__unmount__:${name}`))
 }
