@@ -12,6 +12,7 @@ interface RegistryType {
   [key: string]: Initializer
 }
 
+/** The DOM Event types */
 type EventType =
   | "click"
   | "dblclick"
@@ -59,7 +60,8 @@ type EventType =
   | "touchleave"
   | "touchcancel"
 
-type EventMap = {
+/** The type mapping of {@linkcode EventType} to Event object */
+export type EventMap = {
   click: MouseEvent
   dblclick: MouseEvent
   mousedown: MouseEvent
@@ -99,7 +101,8 @@ type EventMap = {
   touchcancel: TouchEvent
 }
 
-type EventHandler<T extends EventType | string> = (
+/** The type of the event handler */
+export type EventHandler<T extends EventType | string> = (
   e: T extends EventType ? EventMap[T] : CustomEvent,
 ) => void
 
