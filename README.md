@@ -2,7 +2,7 @@
 
 # Cell v0.3.1
 
-> frontend tool for local event handlers and signals
+> A frontend UI tool, encourages local event handlers and signals
 
 ## Features
 
@@ -32,7 +32,16 @@ Or, in Deno,
 deno add @kt3k/cell
 ```
 
-## Hello world
+## Hello world: How to use `on` helper
+
+The below is an example of `cell` component. A `cell` component is a function of
+the type `(ctx: Context) => string | undefined`.
+
+`Context` includes many handy helpers for implementing UI behavior easily and
+quickly.
+
+The below example uses `on` helper, which registers the event handler to the
+mounted dom element, which is `<button>` element in this case.
 
 ```ts
 import { type Context, register } from "@kt3k/cell"
@@ -52,10 +61,12 @@ register(MyComponent, "js-hello")
 
 When you click this button, it alerts "hello".
 
-## Mirroring the inputs
+## Mirroring the inputs: How to use `query` helper
 
-The next component mirrors the input value of `<input>` element to another DOM
-element.
+The next component shows how you can copy the input text into other dom element.
+
+`query` is helper to query by the selector inside your component.
+`query(".dest")` is equivalent of `el.querySelector(".dest")`.
 
 ```ts
 import { type Context, register } from "@kt3k/cell"
@@ -76,33 +87,36 @@ register(Mirroring, "js-mirroring")
 </div>
 ```
 
-## Event Delegation
+## Event Delegation: The 2nd arg of `on` helper
 
 If you pass a string (a selector) as the second argument of `on` function, the
 event handler is only invoked when the event comes from the element which
 matches the given selector.
 
-```js
-import { register, type Context } from "@kt3k/cell";
+```ts
+import { type Context, register } from "@kt3k/cell"
 
 function DelegateComponent({ on, query }: Context) {
   on("click", ".btn", () => {
-    query(".result").textContext += " .btn clicked!";
-  });
+    query(".result").textContext += " .btn clicked!"
+  })
 }
 
-register(DelegateComponent, "js-delegate");
+register(DelegateComponent, "js-delegate")
 ```
 
-## Outside events
+## Outside events: `onOutside` helper
 
-By calling `on.outside(event, handler)`, you can handle the event outside of the
+By calling `onOutside(event, handler)`, you can handle the event outside of the
 component's DOM.
+
+This is convenient, for example, when you like to close the modal dialog when
+the user clicking the outside of it.
 
 ```ts
 import { type Context, register } from "@kt3k/cell"
 
-function OutsideClickComponent({ on }: Context) {
+function OutsideClickComponent({ onOutside }: Context) {
   on.outside("click", ({ e }) => {
     console.log("The outside of my-component has been clicked!")
   })
@@ -112,6 +126,8 @@ register(OutsideClickComponent, "js-outside-click")
 ```
 
 ## Using Cell directly from the browser
+
+The below example shows how you can use `cell` directly in the browsers.
 
 ```html
 <script type="module">
@@ -133,11 +149,14 @@ register(Mirroring, "js-mirroring");
 
 ## Use signals when making remote effect
 
+`cell` generally recommend handling event locally, but in many cases you would
+also need to make effects to remote elements.
+
 If you need to affects the components in remote places (i.e. components not an
 ancestor or decendant of the component), we commend using `signals` for
 communicating with them.
 
-`signals` are event emitter with values, which events are triggered only when
+`signals` are event emitter with values, whose events are triggered only when
 the values are changed.
 
 ```
