@@ -246,6 +246,7 @@ function mount(name, el) {
     classNames = [name];
   }
   classNames.map((className) => {
+    ;
     [].map.call(
       (el || document).querySelectorAll(registry[className].sel),
       registry[className]
@@ -265,4 +266,4 @@ export {
   signal,
   unmount
 };
-/*! Cell v0.2.2 | Copyright 2024 Yoshiya Hinosawa and Capsule contributors | MIT license */
+/*! Cell v0.3.2 | Copyright 2024 Yoshiya Hinosawa and Capsule contributors | MIT license */
