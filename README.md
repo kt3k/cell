@@ -159,19 +159,19 @@ communicating with them.
 `signals` are event emitter with values, whose events are triggered only when
 the values are changed.
 
-```
-import { signal  } from "@kt3k/cell";
+```ts
+import { signal } from "@kt3k/cell"
 
-const sig = signal(0);
+const sig = signal(0)
 
 const stop = sig.onChange((v) => {
-  alert(`The value changed to: ${v}!`);
-});
+  alert(`The value changed to: ${v}!`)
+})
 
-sig.update(1);
-sig.update(2);
+sig.update(1)
+sig.update(2)
 
-stop();
+stop()
 ```
 
 ## Prior art
