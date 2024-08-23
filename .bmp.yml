@@ -1,4 +1,4 @@
-version: 0.3.4
+version: 0.3.5
 commit: 'chore: bump to v%.%.%'
 files:
   README.md: Cell v%.%.%
