@@ -13,7 +13,7 @@ interface RegistryType {
 }
 
 /** The DOM Event types */
-type EventType =
+export type EventType =
   | "click"
   | "dblclick"
   | "mousedown"
