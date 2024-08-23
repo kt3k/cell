@@ -135,82 +135,49 @@ function register(component, name) {
       el.addEventListener(`__unmount__:${name}`, () => {
         el.classList.remove(initClass);
       }, { once: true });
-      const on = new Proxy(() => {
-      }, {
-        // simple event handler (like on.click = (e) => {})
-        set(_, type, value) {
-          addEventListener(name, el, type, value);
-          return true;
-        },
-        get(_, outside) {
-          if (outside === "outside") {
-            return new Proxy({}, {
-              set(_2, type, value) {
-                assert(
-                  typeof value === "function",
-                  `Event handler must be a function, ${typeof value} (${value}) is given`
-                );
-                const listener = (e) => {
-                  if (el !== e.target && !el.contains(e.target)) {
-                    logEvent({
-                      module: "outside",
-                      color: "#39cccc",
-                      e,
-                      component: name
-                    });
-                    value(e);
-                  }
-                };
-                document.addEventListener(type, listener);
-                el.addEventListener(`__unmount__:${name}`, () => {
-                  document.removeEventListener(type, listener);
-                }, { once: true });
-                return true;
-              }
-            });
-          }
-          return null;
-        },
-        // event delegation handler (like on(".button").click = (e) => {}))
-        apply(_target, _thisArg, args) {
-          const arg0 = args[0];
-          if (typeof arg0 === "string") {
-            return new Proxy({}, {
-              set(_, type, value) {
-                addEventListener(
-                  name,
-                  el,
-                  type,
-                  // deno-lint-ignore no-explicit-any
-                  value,
-                  arg0,
-                  args[1]
-                );
-                return true;
-              }
-            });
-          } else if (arg0 && typeof arg0 === "object") {
-            return new Proxy({}, {
-              set(_, type, value) {
-                addEventListener(
-                  name,
-                  el,
-                  type,
-                  // deno-lint-ignore no-explicit-any
-                  value,
-                  void 0,
-                  arg0
-                );
-                return true;
-              }
-            });
-          }
-          throw new Error(`Invalid on(...) call: ${typeof arg0} is given.`);
+      const on = (type, selector, options, handler) => {
+        if (typeof selector === "function") {
+          handler = selector;
+          selector = void 0;
+          options = void 0;
+        } else if (typeof options === "function" && typeof selector === "string") {
+          handler = options;
+          options = void 0;
+        } else if (typeof options === "function" && typeof selector === "object") {
+          handler = options;
+          options = selector;
+          selector = void 0;
         }
-      });
+        if (typeof handler !== "function") {
+          throw new Error(
+            `Cannot add event listener: The handler must be a function, but ${typeof handler} is given`
+          );
+        }
+        addEventListener(name, el, type, handler, selector, options);
+      };
+      const onOutside = (type, handler) => {
+        assertEventType(type);
+        assertEventHandler(handler);
+        const listener = (e) => {
+          if (el !== e.target && !el.contains(e.target)) {
+            logEvent({
+              module: "outside",
+              color: "#39cccc",
+              e,
+              component: name
+            });
+            handler(e);
+          }
+        };
+        document.addEventListener(type, listener);
+        el.addEventListener(`__unmount__:${name}`, () => {
+          document.removeEventListener(type, listener);
+        }, { once: true });
+      };
       const context = {
         el,
         on,
+        onOutside,
         query: (s) => el.querySelector(s),
         queryAll: (s) => el.querySelectorAll(s)
       };
@@ -236,11 +203,21 @@ function register(component, name) {
     });
   }
 }
-function addEventListener(name, el, type, handler, selector, options) {
+function assertEventHandler(handler) {
   assert(
     typeof handler === "function",
-    `Event handler must be a function, ${typeof handler} (${handler}) is given`
+    `Cannot add an event listener: The event handler must be a function, ${typeof handler} (${handler}) is given`
   );
+}
+function assertEventType(type) {
+  assert(
+    typeof type === "string",
+    `Cannot add an event listener: The event type must be a string, ${typeof type} (${type}) is given`
+  );
+}
+function addEventListener(name, el, type, handler, selector, options) {
+  assertEventType(type);
+  assertEventHandler(handler);
   const listener = (e) => {
     if (!selector || [].some.call(
       el.querySelectorAll(selector),
@@ -288,4 +265,4 @@ export {
   signal,
   unmount
 };
-/*! Cell v0.2.1 | Copyright 2024 Yoshiya Hinosawa and Capsule contributors | MIT license */
+/*! Cell v0.2.2 | Copyright 2024 Yoshiya Hinosawa and Capsule contributors | MIT license */

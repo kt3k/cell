@@ -52,9 +52,9 @@ Deno.test("unmount removes the event listeners", () => {
 
   let count = 0;
   function Component({ on }: Context) {
-    on["my-event"] = () => {
+    on("my-event", () => {
       count++;
-    };
+    });
   }
   register(Component, name);
 
@@ -76,12 +76,12 @@ Deno.test("on[event] is called when the event is dispatched", () => {
 
   let called = false;
   function Component({ on }: Context) {
-    on.click = () => {
+    on("click", () => {
       called = true;
-    };
-    on.click = () => {
+    });
+    on("click", () => {
       called = true;
-    };
+    });
   }
   register(Component, name);
 
@@ -99,13 +99,13 @@ Deno.test("on(selector)[event] is called when the event is dispatched only under
   let onBtn2ClickCalled = false;
 
   function Component({ on }: Context) {
-    on(".btn1").click = () => {
+    on("click", ".btn1", () => {
       onBtn1ClickCalled = true;
-    };
+    });
 
-    on(".btn2").click = () => {
+    on("click", ".btn2", () => {
       onBtn2ClickCalled = true;
-    };
+    });
   }
   register(Component, name);
 
@@ -125,9 +125,9 @@ Deno.test("on(option)[event] is called with option as AddEventListnerOptions", (
   document.body.innerHTML = `<div class="${name}"></div>`;
   let count = 0;
   function Component({ on }: Context) {
-    on({ once: true }).click = () => count++;
+    on("click", { once: true }, () => count++);
     // for checking type
-    on({ passive: false }).touchmove = (_e: TouchEvent) => {};
+    on("touchmove", { passive: false }, (_e: TouchEvent) => {});
   }
   register(Component, name);
   const div = queryByClass(name);
@@ -143,10 +143,10 @@ Deno.test("on.outside.event works", () => {
     `<div class="root"><div class="${name}"></div><div class="sibling"></div></div>`;
 
   let calledCount = 0;
-  function Component({ on }: Context) {
-    on.outside.click = () => {
+  function Component({ onOutside }: Context) {
+    onOutside("click", () => {
       calledCount++;
-    };
+    });
   }
   register(Component, name);
 
@@ -193,81 +193,86 @@ Deno.test("query, queryAll works", () => {
 });
 
 Deno.test("assign wrong type to on.event, on.outside.event, on(selector).event", () => {
-  function Component({ on }: Context) {
+  function Component({ on, onOutside }: Context) {
     assertThrows(() => {
-      on.click = "";
-    });
-    assertThrows(() => {
-      on.click = 1;
-    });
-    assertThrows(() => {
-      on.click = Symbol();
-    });
-    assertThrows(() => {
-      on.click = {};
-    });
-    assertThrows(() => {
-      on.click = [];
+      // deno-lint-ignore no-explicit-any
+      on("click", "" as any);
     });
     assertThrows(() => {
       // deno-lint-ignore no-explicit-any
-      on(".btn").click = "" as any;
+      on("click", 1 as any);
     });
     assertThrows(() => {
       // deno-lint-ignore no-explicit-any
-      on(".btn").click = 1 as any;
+      on("click", Symbol() as any);
     });
     assertThrows(() => {
       // deno-lint-ignore no-explicit-any
-      on(".btn").click = Symbol() as any;
+      on("click", {} as any);
     });
     assertThrows(() => {
       // deno-lint-ignore no-explicit-any
-      on(".btn").click = {} as any;
+      on("click", [] as any);
     });
     assertThrows(() => {
       // deno-lint-ignore no-explicit-any
-      on(".btn").click = [] as any;
+      on("click", ".btn", "" as any);
     });
     assertThrows(() => {
       // deno-lint-ignore no-explicit-any
-      on.outside.click = "" as any;
+      on("click", ".btn", 1 as any);
     });
     assertThrows(() => {
       // deno-lint-ignore no-explicit-any
-      on.outside.click = 1 as any;
+      on("click", ".btn", Symbol() as any);
     });
     assertThrows(() => {
       // deno-lint-ignore no-explicit-any
-      on.outside.click = Symbol() as any;
+      on("click", ".btn", {} as any);
     });
     assertThrows(() => {
       // deno-lint-ignore no-explicit-any
-      on.outside.click = {} as any;
+      on("click", ".btn", [] as any);
     });
     assertThrows(() => {
       // deno-lint-ignore no-explicit-any
-      on.outside.click = [] as any;
+      onOutside("click", "" as any);
+    });
+    assertThrows(() => {
+      // deno-lint-ignore no-explicit-any
+      onOutside("click", 1 as any);
+    });
+    assertThrows(() => {
+      // deno-lint-ignore no-explicit-any
+      onOutside("click", Symbol() as any);
+    });
+    assertThrows(() => {
+      // deno-lint-ignore no-explicit-any
+      onOutside("click", {} as any);
+    });
+    assertThrows(() => {
+      // deno-lint-ignore no-explicit-any
+      onOutside("click", [] as any);
     });
   }
   register(Component, randomName());
 });
 
-Deno.test("wrong type selector throws with on(selector).event", () => {
+Deno.test("wrong event type call throws", () => {
   const name = randomName();
   document.body.innerHTML = `<div class="${name}"><div>`;
   function Component({ on }: Context) {
     assertThrows(() => {
       // deno-lint-ignore no-explicit-any
-      on(1 as any);
+      on(1 as any, () => {});
     });
     assertThrows(() => {
       // deno-lint-ignore no-explicit-any
-      on(1n as any);
+      on(1n as any, () => {});
     });
     assertThrows(() => {
       // deno-lint-ignore no-explicit-any
-      on((() => {}) as any);
+      on(1n as any, () => {});
     });
   }
   register(Component, name);
@@ -324,16 +329,6 @@ Deno.test("mount() throws with unregistered name", () => {
   assertThrows(() => {
     mount(randomName());
   });
-});
-
-Deno.test("on.foo returns null", () => {
-  const name = randomName();
-  document.body.innerHTML = `<div class="${name}"><div>`;
-
-  function Component({ on }: Context) {
-    assertEquals(on.foo, null);
-  }
-  register(Component, name);
 });
 
 // test utils

@@ -23,12 +23,12 @@
     <p class="text-gray-700 mt-1">The example of mirroring the input value to another dom.</p>
     <h3 class="mt-10">JS</h3>
     <pre class="js-source overflow-x-scroll lg:rounded-lg shadow-lg bg-gray-800 text-gray-100 p-5 mt-5 -mx-2">function Mirroring({ on, query }) {
-  on.input = () => {
-    query(".dest").textContent = query(".src").value;
-  };
+  on("input", () => {
+    query(".dest").textContent = query(".src").value
+  })
 }
 
-register(Mirroring, "js-mirroring");</pre>
+register(Mirroring, "js-mirroring")</pre>
     <h3 class="mt-10">HTML</h3>
     <pre class="html-source overflow-x-scroll lg:rounded-lg shadow-lg bg-gray-800 text-gray-100 p-5 mt-5 -mx-2"></pre>
     <template>
@@ -48,10 +48,10 @@ register(Mirroring, "js-mirroring");</pre>
     <p>If you return string from your component function, that string becomes the body your mounted element.</p>
     <h3 class="mt-10">JS</h3>
     <pre class="js-source overflow-x-scroll lg:rounded-lg shadow-lg bg-gray-800 text-gray-100 p-5 mt-5 -mx-2">function Hello({ el }) {
-  return `Hello, I'm ${el.textContent}! 👋`;
-};
+  return `Hello, I'm ${el.textContent}! 👋`
+}
 
-register(Hello, "js-hello");</pre>
+register(Hello, "js-hello")</pre>
     <h3 class="mt-10">HTML</h3>
     <pre class="html-source overflow-x-scroll lg:rounded-lg shadow-lg bg-gray-800 text-gray-100 p-5 mt-5 -mx-2"></pre>
     <template>
@@ -83,12 +83,12 @@ register(Hello, "js-hello");</pre>
     </template>
     <h3 class="mt-10">JS</h3>
     <pre class="js-source overflow-x-scroll lg:rounded-lg shadow-lg bg-gray-800 text-gray-100 p-5 mt-5 -mx-2">function Delegation({ on, query }) {
-  on(".btn").click = () => {
-    query(".result").textContent += " .btn clicked!";
-  };
+  on("click", ".btn", () => {
+    query(".result").textContent += " .btn clicked!"
+  })
 }
 
-register(Delegation, "js-delegation");</pre>
+register(Delegation, "js-delegation")</pre>
     <h3 class="mt-10">HTML</h3>
     <pre class="html-source overflow-x-scroll lg:rounded-lg shadow-lg bg-gray-800 text-gray-100 p-5 mt-5 -mx-2"></pre>
     <h3 class="mt-10">Result</h3>
@@ -107,13 +107,13 @@ register(Delegation, "js-delegation");</pre>
       <div class="js-outside-example border">click outside of this area.</div>
     </template>
     <h3 class="mt-10">JS</h3>
-    <pre class="js-source overflow-x-scroll lg:rounded-lg shadow-lg bg-gray-800 text-gray-100 p-5 mt-5 -mx-2">function OutsideComponent({ el, on }) {
-  on.outside.click = () => {
-    el.textContent += " outside clicked!";
-  }
+    <pre class="js-source overflow-x-scroll lg:rounded-lg shadow-lg bg-gray-800 text-gray-100 p-5 mt-5 -mx-2">function OutsideComponent({ el, onOutside }) {
+  onOutside("click", () => {
+    el.textContent += " outside clicked!"
+  })
 }
 
-register(OutsideComponent, "js-outside-example");</pre>
+register(OutsideComponent, "js-outside-example")</pre>
     <h3 class="mt-10">HTML</h3>
     <pre class="html-source overflow-x-scroll lg:rounded-lg shadow-lg bg-gray-800 text-gray-100 p-5 mt-5 -mx-2"></pre>
     <h3 class="mt-10">Result</h3>
@@ -130,13 +130,13 @@ register(OutsideComponent, "js-outside-example");</pre>
     </template>
     <h3 class="mt-10">JS</h3>
     <pre class="js-source overflow-x-scroll lg:rounded-lg shadow-lg bg-gray-800 text-gray-100 p-5 mt-5 -mx-2">function PreventDefaultComponent({ on }) {
-  on.click = (e) => {
-    e.preventDefault();
-    alert("A link is clicked, but the page doesn't move to the target url because the default behavior is prevented ;)");
-  };
+  on("click", (e) => {
+    e.preventDefault()
+    alert("A link is clicked, but the page doesn't move to the target url because the default behavior is prevented ;)")
+  });
 }
 
-register(PreventDefaultComponent, "js-prevent-default-example");</pre>
+register(PreventDefaultComponent, "js-prevent-default-example")</pre>
     <h3 class="mt-10">HTML</h3>
     <pre class="html-source overflow-x-scroll lg:rounded-lg shadow-lg bg-gray-800 text-gray-100 p-5 mt-5 -mx-2"></pre>
     <h3 class="mt-10">Result</h3>

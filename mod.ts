@@ -11,19 +11,6 @@ interface Initializer {
 interface RegistryType {
   [key: string]: Initializer;
 }
-interface EventRegistry {
-  outside: {
-    [key: string]: EventHandler;
-  };
-  // deno-lint-ignore ban-types
-  [key: string]: EventHandler | {};
-  (
-    selector: string | AddEventListenerOptions,
-    options?: AddEventListenerOptions,
-  ): {
-    [key: string]: EventHandler;
-  };
-}
 
 /**
  * The context of the component. This context is passed as the first argument to the component function for each mount.
@@ -33,8 +20,25 @@ interface EventRegistry {
 export interface Context<EL = HTMLElement> {
   /** The element */
   el: EL;
-  /** The event registry. You can register event listener on `el` easily with this helper. */
-  on: EventRegistry;
+  /** Registers the event listener */
+  on(type: string, handler: EventHandler): void;
+  /** Registers the event listener */
+  on(type: string, selector: string, handler: EventHandler): void;
+  /** Registers the event listener */
+  on(
+    type: string,
+    options: AddEventListenerOptions,
+    handler: EventHandler,
+  ): void;
+  /** Registers the event listener */
+  on(
+    type: string,
+    selector: string,
+    options: AddEventListenerOptions,
+    handler: EventHandler,
+  ): void;
+  /** Registers the event listener for the outside of the element */
+  onOutside(type: string, handler: EventHandler): void;
   /** Queries elements by the given selector under the component dom */
   query<T extends HTMLElement = HTMLElement>(selector: string): T | null;
   /** Queries all elements by the given selector under the component dom */
@@ -123,86 +127,68 @@ export function register<EL extends HTMLElement>(
         el.classList.remove(initClass);
       }, { once: true });
 
+      const on = (
+        type: string,
+        // deno-lint-ignore no-explicit-any
+        selector: any,
+        // deno-lint-ignore no-explicit-any
+        options?: any,
+        // deno-lint-ignore no-explicit-any
+        handler?: (e: any) => void,
+      ) => {
+        // normailize arguments
+        if (typeof selector === "function") {
+          handler = selector;
+          selector = undefined;
+          options = undefined;
+        } else if (
+          typeof options === "function" && typeof selector === "string"
+        ) {
+          handler = options;
+          options = undefined;
+        } else if (
+          typeof options === "function" && typeof selector === "object"
+        ) {
+          handler = options;
+          options = selector;
+          selector = undefined;
+        }
+
+        if (typeof handler !== "function") {
+          throw new Error(
+            `Cannot add event listener: The handler must be a function, but ${typeof handler} is given`,
+          );
+        }
+
+        addEventListener(name, el, type, handler, selector, options);
+      };
+
       // deno-lint-ignore no-explicit-any
-      const on: any = new Proxy(() => {}, {
-        // simple event handler (like on.click = (e) => {})
-        set(_: unknown, type: string, value: unknown): boolean {
+      const onOutside = (type: string, handler: (e: any) => void) => {
+        assertEventType(type);
+        assertEventHandler(handler);
+        const listener = (e: Event) => {
           // deno-lint-ignore no-explicit-any
-          addEventListener(name, el, type, value as any);
-          return true;
-        },
-        get(_: unknown, outside: string) {
-          if (outside === "outside") {
-            return new Proxy({}, {
-              set(_: unknown, type: string, value: unknown): boolean {
-                assert(
-                  typeof value === "function",
-                  `Event handler must be a function, ${typeof value} (${value}) is given`,
-                );
-                const listener = (e: Event) => {
-                  // deno-lint-ignore no-explicit-any
-                  if (el !== e.target && !el.contains(e.target as any)) {
-                    logEvent({
-                      module: "outside",
-                      color: "#39cccc",
-                      e,
-                      component: name,
-                    });
-                    (value as EventHandler)(e);
-                  }
-                };
-                document.addEventListener(type, listener);
-                el.addEventListener(`__unmount__:${name}`, () => {
-                  document.removeEventListener(type, listener);
-                }, { once: true });
-                return true;
-              },
+          if (el !== e.target && !el.contains(e.target as any)) {
+            logEvent({
+              module: "outside",
+              color: "#39cccc",
+              e,
+              component: name,
             });
+            handler(e);
           }
-          return null;
-        },
-        // event delegation handler (like on(".button").click = (e) => {}))
-        apply(_target, _thisArg, args) {
-          const arg0 = args[0];
-          // event delegation handler (like on(".button").click = (e) => {}))
-          if (typeof arg0 === "string") {
-            return new Proxy({}, {
-              set(_: unknown, type: string, value: unknown): boolean {
-                addEventListener(
-                  name,
-                  el,
-                  type,
-                  // deno-lint-ignore no-explicit-any
-                  value as any,
-                  arg0,
-                  args[1],
-                );
-                return true;
-              },
-            });
-          } else if (arg0 && typeof arg0 === "object") {
-            return new Proxy({}, {
-              set(_: unknown, type: string, value: unknown): boolean {
-                addEventListener(
-                  name,
-                  el,
-                  type,
-                  // deno-lint-ignore no-explicit-any
-                  value as any,
-                  undefined,
-                  arg0,
-                );
-                return true;
-              },
-            });
-          }
-          throw new Error(`Invalid on(...) call: ${typeof arg0} is given.`);
-        },
-      });
+        };
+        document.addEventListener(type, listener);
+        el.addEventListener(`__unmount__:${name}`, () => {
+          document.removeEventListener(type, listener);
+        }, { once: true });
+      };
 
       const context = {
         el,
         on,
+        onOutside,
         query: <T extends HTMLElement = HTMLElement>(s: string) =>
           el.querySelector(s) as T | null,
         queryAll: <T extends HTMLElement = HTMLElement>(s: string) =>
@@ -235,6 +221,20 @@ export function register<EL extends HTMLElement>(
   }
 }
 
+function assertEventHandler(handler: unknown): asserts handler is EventHandler {
+  assert(
+    typeof handler === "function",
+    `Cannot add an event listener: The event handler must be a function, ${typeof handler} (${handler}) is given`,
+  );
+}
+
+function assertEventType(type: unknown): asserts type is string {
+  assert(
+    typeof type === "string",
+    `Cannot add an event listener: The event type must be a string, ${typeof type} (${type}) is given`,
+  );
+}
+
 function addEventListener(
   name: string,
   el: HTMLElement,
@@ -243,10 +243,8 @@ function addEventListener(
   selector?: string,
   options?: AddEventListenerOptions,
 ) {
-  assert(
-    typeof handler === "function",
-    `Event handler must be a function, ${typeof handler} (${handler}) is given`,
-  );
+  assertEventType(type);
+  assertEventHandler(handler);
 
   const listener = (e: Event) => {
     if (

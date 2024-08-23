@@ -32,124 +32,84 @@ Or, in Deno,
 deno add @kt3k/cell
 ```
 
-## Basic usages
+## Hello world
 
 ```ts
 import { type Context, register } from "@kt3k/cell";
 
 function MyComponent({ on }: Context) {
-  on.click = () => {
+  on("click", () => {
     alert("hello");
-  };
+  });
 }
 
 register(MyComponent, "js-hello");
 ```
 
 ```
-<div class="js-hello">Click</div>
+<button class="js-hello">Click</button>
 ```
 
-## More examples
+When you click this button, it alerts "hello".
 
-Mirrors input value of `<input>` element to another dom.
+## Mirroring the inputs
+
+The next component mirrors the input value of `<input>` element to another DOM
+element.
 
 ```ts
 import { type Context, register } from "@kt3k/cell";
 
 function Mirroring({ on, query }: Context) {
-  on.input = () => {
-    query(".src").textContent = query(".dest").value;
-  };
+  on("input", () => {
+    query(".dest").textContent = query(".src").value;
+  });
 }
 
 register(Mirroring, "js-mirroring");
 ```
 
-Prevent default, stop propagation.
-
-```ts
-import { type Context, register } from "@kt3k/cell";
-
-function PrevetDefaultComponent({ on }: Context) {
-  on.click = (e) => {
-    // e is the native event object.
-    // You can call methods of Event object
-    e.stopPropagation();
-    e.preventDefault();
-  };
-}
-
-register(PreventDefaultComponent, "js-prevent-default");
+```
+<div class="js-mirroring">
+  <input class="src" placeholder="type something" />
+  <p class="dest"></p>
+</div>
 ```
 
-Event delegation. You can assign handlers to `on(selector).event` to use
-[event delegation](https://www.geeksforgeeks.org/event-delegation-in-javascript/)
-pattern.
+## Event Delegation
+
+If you pass a string (a selector) as the second argument of `on` function, the
+event handler is only invoked when the event comes from the element which
+matches the given selector.
 
 ```js
 import { register, type Context } from "@kt3k/cell";
 
 function DelegateComponent({ on, query }: Context) {
-  on(".btn").click = () => {
+  on("click", ".btn", () => {
     query(".result").textContext += " .btn clicked!";
-  }
+  });
 }
 
 register(DelegateComponent, "js-delegate");
 ```
 
-Outside event handler. By assigning `on.outside.event`, you can handle the event
-outside of the component dom.
+## Outside events
+
+By calling `on.outside(event, handler)`, you can handle the event outside of the
+component's DOM.
 
 ```ts
 import { type Context, register } from "@kt3k/cell";
 
 function OutsideClickComponent({ on }: Context) {
-  on.outside.click = ({ e }) => {
+  on.outside("click", ({ e }) => {
     console.log("The outside of my-component has been clicked!");
-  };
+  });
 }
 
 register(OutsideClickComponent, "js-outside-click");
 ```
-
-## How `cell` works
-
-Let's look at the below basic example.
-
-```ts
-import { type Context, register } from "@kt3k/cell";
-
-function MyComponent({ on }: Context) {
-  on.click = () => {
-    console.log("clicked");
-  };
-}
-
-register(MyComponent, "my-component");
-```
-
-This code is roughly translated into jQuery like the below:
-
-```js
-$(document).read(() => {
-  $(".my-component").each(function () {
-    $this = $(this);
-
-    if (isAlreadyInitialized($this)) {
-      return;
-    }
-
-    $this.click(() => {
-      console.log("clicked");
-    });
-  });
-});
-```
-
-`cell` can be seen as a syntax sugar for the above pattern (with a few more
-utilities).
 
 ## Using Cell directly from the browser
 
@@ -158,9 +118,9 @@ utilities).
 import { register } from "https://kt3k.github.io/cell/dist.min.js";
 
 function Mirroring({ on, query }) {
-  on.input = () => {
+  on("input", () => {
     query(".dest").textContent = query(".src").value;
-  };
+  });
 }
 
 register(Mirroring, "js-mirroring");
@@ -171,112 +131,29 @@ register(Mirroring, "js-mirroring");
 </div>
 ```
 
-## Motivation
+## Use signals when making remote effect
 
-Virtual DOM frameworks are good for many use cases, but sometimes they are
-overkill for the use cases where you only need a little bit of event handlers
-and dom modifications.
+If you need to affects the components in remote places (i.e. components not an
+ancestor or decendant of the component), we commend using `signals` for
+communicating with them.
 
-This `cell` library explores the new way of simple event-driven DOM programming
-without virtual dom.
+`signals` are event emitter with values, which events are triggered only when
+the values are changed.
 
-## Slogans
+```
+import { signal  } from "@kt3k/cell";
 
-- Local query is good. Global query is bad.
-- Define behaviors based on HTML classes.
-- Use signal when making remote effect.
+const sig = signal(0);
 
-### Local query is good. Global query is bad
-
-When people use jQuery, they often do:
-
-```js
-$(".some-class").each(function () {
-  $(this).on("some-event", () => {
-    $(".some-target").each(function () {
-      // some effects on this element
-    });
-  });
+const stop = sig.onChange((v) => {
+  alert(`The value changed to: ${v}!`);
 });
+
+sig.update(1);
+sig.update(2);
+
+stop();
 ```
-
-This is very common pattern, and this is very bad.
-
-The above code can been seen as a behavior of `.some-class` elements, and they
-use global query `$(".some-target")`. Because they use global query here, they
-depend on the entire DOM tree of the page. If the page change anything in it,
-the behavior of the above code can potentially be changed.
-
-This is so unpredictable because any change in the page can affect the behavior
-of the above class. You can predict what happens with the above code only when
-you understand every details of the entire application, and that's often
-impossible when the application is large size, and multiple people working on
-that app.
-
-So how to fix this? We recommend you should use **local** queries.
-
-Let's see this example:
-
-```js
-$(".some-class").each(function () {
-  $(this).on("some-event", () => {
-    $(this).find(".some-target").each(function () {
-      // some effects on this element
-    });
-  });
-});
-```
-
-The difference is `$(this).find(".some-target")` part. This selects the elements
-only under each `.some-class` element. So this code only depends on the elements
-inside it, which means there is no global dependencies here.
-
-`cell` enforces this pattern by providing `query` function to the component
-which only finds elements under the given element.
-
-```ts
-function MyComponent({ on, query }: Context) {
-  on.click = () => {
-    query(".some-target")!.textContent = "clicked";
-  };
-}
-```
-
-Here `query` is the alias of `el.querySelector` and it finds `.some-target` only
-under it. So the dependency is **local** here.
-
-### Define behaviors based on HTML classes
-
-From our observation, skilled jQuery developers always define DOM behaviors
-based on HTML classes.
-
-We borrowed this pattern, and `cell` allows you to define behavior only based on
-HTML classes, not random combination of query selectors.
-
-```html
-<div class="hello">John Doe</div>
-```
-
-```js
-function MyComponent({ on }: Context) {
-  alert(`Hello, I'm ${el.textContext}!`);
-}
-
-register(MyComponent, "js-hello");
-```
-
-### Use signal when making remote effect
-
-We generally recommend using only local queries, but how to make effects to the
-remote elements?
-
-We reommend using signal pattern here. By using this pattern, you can decouple
-those affecting and affected elements. If you decouple those elements, you can
-test those components independently by using events as I/O of those components.
-
-`cell` library provides `signal` API for supporting this pattern.
-
-TBD
 
 ## Prior art
 
