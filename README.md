@@ -117,7 +117,7 @@ the user clicking the outside of it.
 import { type Context, register } from "@kt3k/cell"
 
 function OutsideClickComponent({ onOutside }: Context) {
-  on.outside("click", ({ e }) => {
+  onOutside("click", ({ e }) => {
     console.log("The outside of my-component has been clicked!")
   })
 }
