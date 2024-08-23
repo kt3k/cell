@@ -266,4 +266,4 @@ export {
   signal,
   unmount
 };
-/*! Cell v0.3.2 | Copyright 2024 Yoshiya Hinosawa and Capsule contributors | MIT license */
+/*! Cell v0.3.6 | Copyright 2024 Yoshiya Hinosawa and Capsule contributors | MIT license */
