@@ -1,6 +1,6 @@
 <img src="https://kt3k.github.io/cell/cell-logo.svg" width="70" alt="cell" />
 
-# Cell v0.3.6
+# Cell v0.3.7
 
 > A frontend UI tool, encourages local event handlers and signals
 
