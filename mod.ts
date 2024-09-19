@@ -1,4 +1,4 @@
-/*! Cell v0.4.2 | Copyright 2024 Yoshiya Hinosawa and Capsule contributors | MIT license */
+/*! Cell v0.4.3 | Copyright 2024 Yoshiya Hinosawa and Capsule contributors | MIT license */
 import { documentReady, logEvent } from "./util.ts"
 export { signal, groupSignal } from "@kt3k/signal"
 
