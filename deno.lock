@@ -2,7 +2,7 @@
   "version": "4",
   "specifiers": {
     "jsr:@b-fuze/deno-dom@~0.1.47": "0.1.48",
-    "jsr:@kt3k/signal@~0.1.7": "0.1.7",
+    "jsr:@kt3k/signal@0.2": "0.2.0",
     "jsr:@std/assert@1": "1.0.5",
     "jsr:@std/assert@^1.0.2": "1.0.2",
     "jsr:@std/async@1": "1.0.5",
@@ -18,8 +18,8 @@
     "@b-fuze/deno-dom@0.1.48": {
       "integrity": "bf5b591aef2e9e9c59adfcbb93a9ecd45bab5b7c8263625beafa5c8f1662e7da"
     },
-    "@kt3k/signal@0.1.7": {
-      "integrity": "3cf4f330b589833f26822d7f5335513ea4760dbffe5fd72dec841ba46bd2ab25"
+    "@kt3k/signal@0.2.0": {
+      "integrity": "f208f9cd19f34403adfe1d712b2881b4b62ac8c46f8f0c221694010e03ddc6a8"
     },
     "@std/assert@1.0.2": {
       "integrity": "ccacec332958126deaceb5c63ff8b4eaf9f5ed0eac9feccf124110435e59e49c",
@@ -116,7 +116,7 @@
   "workspace": {
     "dependencies": [
       "jsr:@b-fuze/deno-dom@~0.1.47",
-      "jsr:@kt3k/signal@~0.1.7",
+      "jsr:@kt3k/signal@0.2",
       "jsr:@std/assert@1",
       "jsr:@std/async@1",
       "jsr:@std/testing@1"
