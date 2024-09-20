@@ -40,8 +40,8 @@ function logEvent({
   console.groupEnd();
 }
 
-// https://jsr.io/@kt3k/signal/0.1.6/mod.ts
-var Signal = class {
+// https://jsr.io/@kt3k/signal/0.3.0/mod.ts
+var Signal = class _Signal {
   #val;
   #handlers = [];
   constructor(value) {
@@ -69,11 +69,55 @@ var Signal = class {
     }
   }
   /**
-   * Update the signal value by comparing the fields of the new value.
+   * Subscribe to the signal.
+   *
+   * @param cb The callback function to be called when the signal is updated
+   * @returns A function to stop the subscription
+   */
+  onChange(cb) {
+    this.#handlers.push(cb);
+    return () => {
+      this.#handlers.splice(this.#handlers.indexOf(cb) >>> 0, 1);
+    };
+  }
+  /**
+   * Subscribe to the signal.
+   *
+   * @param cb The callback function to be called when the signal is updated and also called immediately
+   * @returns A function to stop the subscription
+   */
+  subscribe(cb) {
+    cb(this.#val);
+    return this.onChange(cb);
+  }
+  /** Maps the signal to a different signal */
+  map(fn) {
+    const signal = new _Signal(fn(this.#val));
+    this.onChange((val) => signal.update(fn(val)));
+    return signal;
+  }
+};
+var GroupSignal = class _GroupSignal {
+  #val;
+  #handlers = [];
+  constructor(value) {
+    this.#val = value;
+  }
+  /**
+   * Get the current value of the signal.
+   *
+   * @returns The current value of the signal
+   */
+  get() {
+    return this.#val;
+  }
+  /**
+   * Update the signal value.
+   * The signal event is only emitted when the fields of the new value are different from the current value.
    *
    * @param value The new value of the signal
    */
-  updateByFields(value) {
+  update(value) {
     if (typeof value !== "object" || value === null) {
       throw new Error("value must be an object");
     }
@@ -99,10 +143,23 @@ var Signal = class {
       this.#handlers.splice(this.#handlers.indexOf(cb) >>> 0, 1);
     };
   }
+  /**
+   * Subscribe to the signal.
+   *
+   * @param cb The callback function to be called when the signal is updated and also called immediately
+   * @returns A function to stop the subscription
+   */
+  subscribe(cb) {
+    cb(this.#val);
+    return this.onChange(cb);
+  }
+  /** Maps the signal to a different signal */
+  map(fn) {
+    const signal = new _GroupSignal(fn(this.#val));
+    this.onChange((val) => signal.update(fn(val)));
+    return signal;
+  }
 };
-function signal(value) {
-  return new Signal(value);
-}
 
 // mod.ts
 var registry = {};
@@ -261,9 +318,10 @@ function unmount(name, el) {
   el.dispatchEvent(new CustomEvent(`__unmount__:${name}`));
 }
 export {
+  GroupSignal,
+  Signal,
   mount,
   register,
-  signal,
   unmount
 };
-/*! Cell v0.3.6 | Copyright 2024 Yoshiya Hinosawa and Capsule contributors | MIT license */
+/*! Cell v0.4.4 | Copyright 2024 Yoshiya Hinosawa and Capsule contributors | MIT license */

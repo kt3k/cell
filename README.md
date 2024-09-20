@@ -160,12 +160,12 @@ communicating with them.
 the values are changed.
 
 ```ts
-import { signal } from "@kt3k/cell"
+import { Signal } from "@kt3k/cell"
 
-const sig = signal(0)
+const sig = new Signal(0)
 
-const stop = sig.onChange((v) => {
-  alert(`The value changed to: ${v}!`)
+const stop = sig.subscribe((v) => {
+  console.log(`The value is ${v}!`)
 })
 
 sig.update(1)
