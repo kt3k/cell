@@ -1,5 +1,5 @@
 version: 0.7.0
-commit: 'chore: bump to v%.%.%'
+commit: "chore: bump to v%.%.%"
 files:
   README.md: Cell v%.%.%
   mod.ts: Cell v%.%.%
