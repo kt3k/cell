@@ -22,25 +22,26 @@ Deno.test("Component body is called when the component is mounted", () => {
   assert(called)
 })
 
-/*
-Deno.test("on.__unmount__ is called when the componet is unmounted", () => {
-  const name = randomName();
-  const { on } = component(name);
+Deno.test("onUnmount registers the event handler for the unmount event", () => {
+  const name = randomName()
 
-  document.body.innerHTML = `<div class="${name}"></div>`;
+  document.body.innerHTML = `<div class="${name}"></div>`
 
-  let called = false;
+  let called = false
 
-  on.__unmount__ = () => {
-    called = true;
-  };
+  function Component({ onUnmount }: Context) {
+    onUnmount(() => {
+      console.log("onUnmount called")
+      called = true
+    })
+  }
+  register(Component, name)
 
-  mount();
-  assert(!called);
-  unmount(name, query(`.${name}`)!);
-  assert(called);
-});
-*/
+  mount()
+  assert(!called)
+  unmount(name, document.body.firstChild!)
+  assert(called)
+})
 
 Deno.test("unmount removes the event listeners", () => {
   const name = randomName()

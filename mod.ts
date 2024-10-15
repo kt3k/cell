@@ -140,6 +140,8 @@ export interface Context<EL = HTMLElement> {
     type: T,
     handler: EventHandler<T>,
   ): void
+  /** Registers the unmount event listner */
+  onUnmount(handler: () => void): void
   /** Queries elements by the given selector under the component dom */
   query<T extends HTMLElement = HTMLElement>(selector: string): T | null
   /** Queries all elements by the given selector under the component dom */
@@ -282,10 +284,15 @@ export function register<EL extends HTMLElement>(
         }, { once: true })
       }
 
+      const onUnmount = (handler: () => void) => {
+        el.addEventListener(`__unmount__:${name}`, handler, { once: true })
+      }
+
       const context = {
         el,
         on,
         onOutside,
+        onUnmount,
         query: <T extends HTMLElement = HTMLElement>(s: string) =>
           el.querySelector(s) as T | null,
         queryAll: <T extends HTMLElement = HTMLElement>(s: string) =>
@@ -412,7 +419,7 @@ export function mount(name?: string | null, el?: HTMLElement) {
  * @param name The component name to unmount.
  * @param el The element of the component to unmount.
  */
-export function unmount(name: string, el: HTMLElement) {
+export function unmount(name: string, el: EventTarget) {
   assert(
     !!registry[name],
     `The component of the given name is not registered: ${name}`,
