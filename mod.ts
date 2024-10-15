@@ -1,4 +1,5 @@
 /*! Cell v0.5.0 | Copyright 2024 Yoshiya Hinosawa and Capsule contributors | MIT license */
+import type { GroupSignal, Signal } from "@kt3k/signal"
 import { documentReady, logEvent } from "./util.ts"
 export { GroupSignal, Signal } from "@kt3k/signal"
 
@@ -148,6 +149,10 @@ export interface Context<EL = HTMLElement> {
   queryAll<T extends HTMLElement = HTMLElement>(
     selector: string,
   ): NodeListOf<T>
+  /** Subscribe to the signal. Unsubscribe it when the component unmounted */
+  subscribe<T>(signal: Signal<T>, handler: (value: T) => void): void
+  /** Subscribe to the group signal. Unsubscribe it when the component unmounted */
+  subscribe<T>(signal: GroupSignal<T>, handler: (value: T) => void): void
 }
 
 /** The component type */
@@ -218,13 +223,15 @@ export function register<EL extends HTMLElement>(
   /** Initializes the html element by the given configuration. */
   const initializer = (el: EL) => {
     if (!el.classList.contains(initClass)) {
+      const onUnmount = (handler: () => void) => {
+        el.addEventListener(`__unmount__:${name}`, handler, { once: true })
+      }
+
       // FIXME(kt3k): the below can be written as .add(name, initClass)
       // when deno_dom fixes add class.
       el.classList.add(name)
       el.classList.add(initClass)
-      el.addEventListener(`__unmount__:${name}`, () => {
-        el.classList.remove(initClass)
-      }, { once: true })
+      onUnmount(() => el.classList.remove(initClass))
 
       const on = (
         type: string,
@@ -279,13 +286,14 @@ export function register<EL extends HTMLElement>(
           }
         }
         document.addEventListener(type, listener)
-        el.addEventListener(`__unmount__:${name}`, () => {
-          document.removeEventListener(type, listener)
-        }, { once: true })
+        onUnmount(() => document.removeEventListener(type, listener))
       }
 
-      const onUnmount = (handler: () => void) => {
-        el.addEventListener(`__unmount__:${name}`, handler, { once: true })
+      const subscribe = <T>(
+        signal: Signal<unknown> | GroupSignal<unknown>,
+        handler: (value: unknown) => void,
+      ) => {
+        onUnmount(signal.subscribe(handler))
       }
 
       const context = {
@@ -297,6 +305,7 @@ export function register<EL extends HTMLElement>(
           el.querySelector(s) as T | null,
         queryAll: <T extends HTMLElement = HTMLElement>(s: string) =>
           el.querySelectorAll(s) as NodeListOf<T>,
+        subscribe,
       }
       const html = component(context)
       if (typeof html === "string") {
