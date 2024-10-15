@@ -6,8 +6,8 @@
 
 ## Features
 
-- Cell encourages **local event handlers**
-- Cell provides **signals** for remote effects
+- Cell encourages **local event handlers** pattern
+- Cell encourages **signals** pattern for remote effects
 - **Lightweight** (**< 1.5 kiB** gzipped)
 - **TypeScript** friendly
 
@@ -131,15 +131,15 @@ The below example shows how you can use `cell` directly in the browsers.
 
 ```html
 <script type="module">
-import { register } from "https://kt3k.github.io/cell/dist.min.js";
+  import { register } from "https://kt3k.github.io/cell/dist.min.js"
 
-function Mirroring({ on, query }) {
-  on("input", () => {
-    query(".dest").textContent = query(".src").value;
-  });
-}
+  function Mirroring({ on, query }) {
+    on("input", () => {
+      query(".dest").textContent = query(".src").value
+    })
+  }
 
-register(Mirroring, "js-mirroring");
+  register(Mirroring, "js-mirroring")
 </script>
 <div class="js-mirroring">
   <input class="src" placeholder="Type something" />
@@ -149,8 +149,8 @@ register(Mirroring, "js-mirroring");
 
 ## Use signals when making remote effect
 
-`cell` generally recommend handling event locally, but in many cases you would
-also need to make effects to remote elements.
+`cell` recommends handling event locally, but in many cases you would also need
+to make effects to remote elements.
 
 If you need to affects the components in remote places (i.e. components not an
 ancestor or decendant of the component), we commend using `signals` for
@@ -160,18 +160,18 @@ communicating with them.
 the values are changed.
 
 ```ts
-import { Signal } from "@kt3k/cell"
+import { Context, Signal } from "@kt3k/cell"
 
 const sig = new Signal(0)
 
-const stop = sig.subscribe((v) => {
-  console.log(`The value is ${v}!`)
-})
+function Component({ el, subscribe }: Context) {
+  subscribe(sig, (v) => {
+    el.textContent = `The value is ${v}`
+  })
+}
 
 sig.update(1)
 sig.update(2)
-
-stop()
 ```
 
 ## Prior art

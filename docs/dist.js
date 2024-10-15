@@ -187,11 +187,12 @@ function register(component, name) {
   const initClass = `${name}-\u{1F48A}`;
   const initializer = (el) => {
     if (!el.classList.contains(initClass)) {
+      const onUnmount = (handler) => {
+        el.addEventListener(`__unmount__:${name}`, handler, { once: true });
+      };
       el.classList.add(name);
       el.classList.add(initClass);
-      el.addEventListener(`__unmount__:${name}`, () => {
-        el.classList.remove(initClass);
-      }, { once: true });
+      onUnmount(() => el.classList.remove(initClass));
       const on = (type, selector, options, handler) => {
         if (typeof selector === "function") {
           handler = selector;
@@ -227,16 +228,19 @@ function register(component, name) {
           }
         };
         document.addEventListener(type, listener);
-        el.addEventListener(`__unmount__:${name}`, () => {
-          document.removeEventListener(type, listener);
-        }, { once: true });
+        onUnmount(() => document.removeEventListener(type, listener));
+      };
+      const subscribe = (signal, handler) => {
+        onUnmount(signal.subscribe(handler));
       };
       const context = {
         el,
         on,
         onOutside,
+        onUnmount,
         query: (s) => el.querySelector(s),
-        queryAll: (s) => el.querySelectorAll(s)
+        queryAll: (s) => el.querySelectorAll(s),
+        subscribe
       };
       const html = component(context);
       if (typeof html === "string") {
@@ -324,4 +328,4 @@ export {
   register,
   unmount
 };
-/*! Cell v0.4.4 | Copyright 2024 Yoshiya Hinosawa and Capsule contributors | MIT license */
+/*! Cell v0.6.0 | Copyright 2024 Yoshiya Hinosawa and Capsule contributors | MIT license */
