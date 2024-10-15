@@ -328,4 +328,4 @@ export {
   register,
   unmount
 };
-/*! Cell v0.6.0 | Copyright 2024 Yoshiya Hinosawa and Capsule contributors | MIT license */
+/*! Cell v0.7.5 | Copyright 2024 Yoshiya Hinosawa and Capsule contributors | MIT license */
