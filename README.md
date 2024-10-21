@@ -174,6 +174,33 @@ sig.update(1)
 sig.update(2)
 ```
 
+## Write test of components
+
+Use `@b-fuse/deno-dom` for polyfill `document` object. An example of basic test
+case of a component looks like the below:
+
+```ts
+import { DOMParser } from "@b-fuze/deno-dom"
+import { assertEquals } from "@std/assert"
+import { type Context, mount, register } from "@kt3k/cell"
+
+Deno.test("A test case of Component", () => {
+  function Component({ el }: Context) {
+    el.textContent = "a"
+  }
+
+  register(Component, "js-component")
+
+  globalThis.document = new DOMParser().parseFromString(
+    `<body><div class="js-component"></div></body>`,
+    "text/html",
+    // deno-lint-ignore no-explicit-any
+  ) as any
+  mount()
+  assertEquals(document.body.firstChild?.textContent, "a")
+})
+```
+
 ## Prior art
 
 - [capsule](https://github.com/capsidjs/capsule)

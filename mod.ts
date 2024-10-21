@@ -1,4 +1,4 @@
-/*! Cell v0.7.5 | Copyright 2024 Yoshiya Hinosawa and Capsule contributors | MIT license */
+/*! Cell v0.7.5 | Copyright 2022-2024 Yoshiya Hinosawa and Capsule contributors | MIT license */
 import type { GroupSignal, Signal } from "@kt3k/signal"
 import { documentReady, logEvent } from "./util.ts"
 export { GroupSignal, Signal } from "@kt3k/signal"
@@ -324,6 +324,8 @@ export function register<EL extends HTMLElement>(
   initializer.sel = `.${name}:not(.${initClass})`
 
   registry[name] = initializer
+
+  if (!globalThis.document) return
 
   if (document.readyState === "complete") {
     mount()

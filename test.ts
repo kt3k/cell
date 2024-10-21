@@ -1,4 +1,4 @@
-// Copyright 2022 Yoshiya Hinosawa. All rights reserved. MIT license.
+// Copyright 2022-2024 Yoshiya Hinosawa. All rights reserved. MIT license.
 
 import { assert, assertEquals, assertExists, assertThrows } from "@std/assert"
 import { delay } from "@std/async"
