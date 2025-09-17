@@ -32,12 +32,12 @@ Or, in Deno,
 deno add @kt3k/cell
 ```
 
-## Hello world: How to use `on` helper
+## Hello world: How to use `on`
 
-The below is an example of `cell` component. A `cell` component is a function of
+The below is an example of a cell component. A cell component is a function of
 the type `(ctx: Context) => string | undefined`.
 
-`Context` includes many handy helpers for implementing UI behavior easily and
+`Context` includes handy helpers for implementing UI behavior easily and
 quickly.
 
 The below example uses `on` helper, which registers the event handler to the
@@ -61,9 +61,9 @@ register(MyComponent, "js-hello")
 
 When you click this button, it alerts "hello".
 
-## Mirroring the inputs: How to use `query` helper
+## Mirroring the inputs: How to use `query`
 
-The next component shows how you can copy the input text into other dom element.
+The component below shows how to copy the input text into other dom element.
 
 `query` is helper to query by the selector inside your component.
 `query(".dest")` is equivalent of `el.querySelector(".dest")`.
@@ -87,7 +87,7 @@ register(Mirroring, "js-mirroring")
 </div>
 ```
 
-## Event Delegation: The 2nd arg of `on` helper
+## Event Delegation: Use the 2nd arg of `on`
 
 If you pass a string (a selector) as the second argument of `on` function, the
 event handler is only invoked when the event comes from the element which
@@ -127,7 +127,8 @@ register(OutsideClickComponent, "js-outside-click")
 
 ## Using Cell directly from the browser
 
-The below example shows how you can use `cell` directly in the browsers.
+You can import directly from `https://kt3k.github.io/cell/dist.min.js` to try
+cell in the browser.
 
 ```html
 <script type="module">
@@ -149,8 +150,8 @@ The below example shows how you can use `cell` directly in the browsers.
 
 ## Use signals when making remote effect
 
-`cell` recommends handling event locally, but in many cases you would also need
-to make effects to remote elements.
+Cell encourages local event handling, but in many cases you would also need to
+make effects to remote elements.
 
 If you need to affects the components in remote places (i.e. components not an
 ancestor or decendant of the component), we commend using `signals` for
@@ -174,7 +175,7 @@ sig.update(1)
 sig.update(2)
 ```
 
-## Write test of components
+## Write unit tests of components
 
 Use `@b-fuse/deno-dom` for polyfill `document` object. An example of basic test
 case of a component looks like the below:
@@ -200,6 +201,19 @@ Deno.test("A test case of Component", () => {
   assertEquals(document.body.firstChild?.textContent, "a")
 })
 ```
+
+## Notes
+
+### About local event handlers
+
+We call DOM event handlers local when
+
+1. it only reads the data in the bound DOM element
+2. and it only manipulates DOM elements inside the bound DOM element
+
+The `Context` helpers in cell like `on`, `el`, `query`, and `queryAll` have
+focus on the retrieval and manipulation of local data and makes it easier to
+write local event handlers
 
 ## Prior art
 
