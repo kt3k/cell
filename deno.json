@@ -27,7 +27,8 @@
   "fmt": {
     "semiColons": false,
     "exclude": [
-      ".bmp.yml"
+      ".bmp.yml",
+      "docs"
     ]
   }
 }
