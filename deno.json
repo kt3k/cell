@@ -30,5 +30,6 @@
       ".bmp.yml",
       "docs"
     ]
-  }
+  },
+  "lock": false
 }

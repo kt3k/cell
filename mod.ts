@@ -152,7 +152,10 @@ export interface Context<EL = HTMLElement> {
   /** Subscribe to the signal. Unsubscribe it when the component unmounted */
   subscribe<T>(signal: Signal<T>, handler: (value: T) => void): void
   /** Subscribe to the group signal. Unsubscribe it when the component unmounted */
-  subscribe<T>(signal: GroupSignal<T>, handler: (value: T) => void): void
+  subscribe<T extends Record<string, unknown>>(
+    signal: GroupSignal<T>,
+    handler: (value: T) => void,
+  ): void
 }
 
 /** The component type */
@@ -289,8 +292,8 @@ export function register<EL extends HTMLElement>(
         onUnmount(() => document.removeEventListener(type, listener))
       }
 
-      const subscribe = <T>(
-        signal: Signal<unknown> | GroupSignal<unknown>,
+      const subscribe = <T extends Record<string, unknown>>(
+        signal: Signal<unknown> | GroupSignal<T>,
         handler: (value: unknown) => void,
       ) => {
         onUnmount(signal.subscribe(handler))
