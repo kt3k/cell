@@ -1,4 +1,4 @@
-/*! Cell v0.7.7 | Copyright 2022-2024 Yoshiya Hinosawa and Capsule contributors | MIT license */
+/*! Cell v0.7.8 | Copyright 2022-2024 Yoshiya Hinosawa and Capsule contributors | MIT license */
 import type { GroupSignal, Signal } from "@kt3k/signal"
 import { documentReady, logEvent } from "./util.ts"
 export { GroupSignal, Signal } from "@kt3k/signal"
