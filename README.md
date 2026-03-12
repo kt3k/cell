@@ -215,7 +215,9 @@ The `Context` helpers in cell like `on`, `el`, `query`, and `queryAll` have
 focus on the retrieval and manipulation of local data and makes it easier to
 write local event handlers
 
-## Prior art
+## Earlier works
+
+Previous projects which implemented the same idea in a different syntax.
 
 - [capsule](https://github.com/capsidjs/capsule)
 - [capsid](https://github.com/capsidjs/capsid)
