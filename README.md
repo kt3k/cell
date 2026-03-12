@@ -29,7 +29,7 @@ npx jsr add @kt3k/cell
 Or, in Deno,
 
 ```
-deno add @kt3k/cell
+deno install jsr:@kt3k/cell
 ```
 
 ## Hello world: How to use `on`
